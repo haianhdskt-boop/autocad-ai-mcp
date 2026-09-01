@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autocad-mcp"
+version = "0.1.0"
+description = "Model Context Protocol (MCP) server for AutoCAD and DXF CAD drawings manipulation, inspection, rendering, and automation."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Hai Anh" }
+]
+dependencies = [
+    "fastmcp>=4.0.0",
+    "ezdxf>=1.4.0",
+    "Pillow>=10.0.0",
+    "matplotlib>=3.8.0",
+    "numpy>=1.25.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+autocad-mcp = "autocad_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["autocad_mcp*"]

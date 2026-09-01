@@ -1,0 +1,6 @@
+"""Entrypoint for AutoCAD MCP Server."""
+
+from autocad_mcp.server import main
+
+if __name__ == "__main__":
+    main()
