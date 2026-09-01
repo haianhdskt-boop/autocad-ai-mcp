@@ -8,11 +8,12 @@ from autocad_ai.core.modifier import build_modify_commands
 from autocad_ai.core.finalizer import build_finalized_sheets_commands
 from autocad_ai.core.estimator import calculate_detailed_construction_boq
 from autocad_ai.core.inspector import check_room_clear_dimensions, build_inspection_commands
+from autocad_ai.core.plotter import build_plot_single_sheet_commands, build_batch_plot_commands
 from autocad_ai.drivers.mac_driver import dispatch_to_autocad_mac, is_autocad_running_mac
 
 mcp = FastMCP(
     name="autocad-ai-mac",
-    instructions="AutoCAD AI Professional Architect Suite (macOS): 6 core business commands for live drafting, modification, multi-sheet construction documentation, detailed BOQ estimation, and drawing inspection.",
+    instructions="AutoCAD AI Professional Architect Suite (macOS): 7 core business commands for live drafting, modification, multi-sheet construction documentation, detailed BOQ estimation, inspection, and standardized PDF plotting.",
 )
 
 
@@ -159,9 +160,66 @@ def cad_command(commands: List[str]) -> Dict[str, Any]:
     return dispatch_to_autocad_mac(commands)
 
 
+@mcp.tool()
+def cad_plot(
+    plot_scope: str = "batch_all",
+    sheet_code: str = "KT-01",
+    output_pdf_file: Optional[str] = None,
+    output_directory: Optional[str] = None,
+    project_name: str = "NHA_PHO",
+    paper_size: str = "A3",
+    plot_style: str = "monochrome.ctb",
+    window_p1: Optional[List[float]] = None,
+    window_p2: Optional[List[float]] = None,
+) -> Dict[str, Any]:
+    """
+    7. IN & XUẤT HỒ SƠ PDF CHUẨN KỸ THUẬT (cad_plot):
+    In trực tiếp từ AutoCAD ra file PDF với đầy đủ độ dày nét phân cấp và màu đen chuẩn (monochrome.ctb).
+    - plot_scope:
+        * 'batch_all': In hàng loạt toàn bộ 4 bản vẽ KT-01 đến KT-04 ra các file PDF chuẩn A3 trong thư mục chỉ định.
+        * 'single_sheet': In 1 bản vẽ cụ thể theo tọa độ window hoặc mã hiệu bản vẽ.
+    - paper_size: 'A3' (mặc định 420x297mm), 'A2', 'A4'
+    - plot_style: 'monochrome.ctb' (in đen trắng nét kỹ thuật), 'acad.ctb' (in theo màu layer)
+    - output_directory: Thư mục lưu file PDF xuất ra
+    """
+    if plot_scope == "batch_all":
+        batch_res = build_batch_plot_commands(
+            output_directory=output_directory,
+            project_name=project_name,
+            paper_size=paper_size,
+            plot_style=plot_style,
+        )
+        dispatch_res = dispatch_to_autocad_mac(batch_res["commands"])
+        batch_res["dispatch_status"] = dispatch_res
+        return batch_res
+    else:
+        out_pdf = output_pdf_file or f"~/Desktop/{project_name}_{sheet_code}.pdf"
+        p1 = window_p1 or [-2000.0, -3000.0]
+        p2 = window_p2 or [12000.0, 17000.0]
+        cmds = build_plot_single_sheet_commands(
+            sheet_code=sheet_code,
+            window_p1=p1,
+            window_p2=p2,
+            output_pdf_path=out_pdf,
+            paper_size=paper_size,
+            plot_style=plot_style,
+        )
+        cmds.append("_.ZOOM _E")
+        dispatch_res = dispatch_to_autocad_mac(cmds)
+        return {
+            "status": "success",
+            "sheet_code": sheet_code,
+            "output_pdf": out_pdf,
+            "paper_size": paper_size,
+            "plot_style": plot_style,
+            "dispatch_status": dispatch_res,
+        }
+
+
 def main():
     mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
     main()
+

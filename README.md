@@ -25,22 +25,24 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 ---
 
-## 🏛️ TRỌN BỘ 6 LỆNH NGHIỆP VỤ CỐT LÕI
+## 🏛️ TRỌN BỘ 7 LỆNH NGHIỆP VỤ CỐT LÕI
 
 ```
                   ┌─────────────────────────────────────────────────────────────┐
                   │            TRỢ LÝ AI ĐIỀU KHIỂN AUTOCAD TRỰC TIẾP           │
                   └──────────────┬───────────────────────────────┬──────────────┘
                                  │                               │
-            GIAI ĐOẠN THIẾT KẾ & SỬA ĐỔI            GIAI ĐOẠN HỒ SƠ & DỰ TOÁN
+            GIAI ĐOẠN THIẾT KẾ & SỬA ĐỔI            GIAI ĐOẠN HỒ SƠ, DỰ TOÁN & IN ẤN
             ┌────────────────────────────┐          ┌────────────────────────────┐
             │ 1. ✍️ cad_draw_new         │          │ 3. 📐 cad_finalize_drawing │
             │ (Vẽ mới không gian/tường)  │          │ (Tách bộ 4 bản vẽ thi công)│
             │                            │          │                            │
             │ 2. 🔧 cad_modify           │          │ 4. 📊 cad_estimate         │
             │ (Sửa, dịch tường, đổi cửa) │          │ (Bóc dự toán chi tiết Excel│
-            └────────────────────────────┘          └────────────────────────────┘
-                                 │                               │
+            └────────────────────────────┘          │                            │
+                                 │                  │ 7. 🖨️ cad_plot             │
+                                 │                  │ (In PDF đen trắng nét chuẩn│
+                                 │                  └────────────────────────────┘
                                  ├───────────────────────────────┤
                                  │ 5. 🔍 cad_inspect (Đo đạc/lỗi)│
                                  │ 6. ⚡ cad_command (Lệnh CAD)  │
@@ -86,6 +88,13 @@ Kiểm tra diện tích thông thủy, kích thước lọt lòng theo tiêu chu
 
 ### 6️⃣ `cad_command` — Gửi Lệnh AutoCAD Gốc
 Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.REGENALL`.
+
+### 7️⃣ `cad_plot` — In & Xuất Hồ Sơ PDF Chuẩn Nét Kỹ Thuật
+In trực tiếp từ AutoCAD ra file **PDF A3/A2** với phân cấp độ dày nét chuẩn (`monochrome.ctb` in đen trắng, tường/cột $0.40\text{mm}$, nét thấy $0.20\text{mm}$, dim/trục $0.13\text{mm}$, hatch $0.09\text{mm}$):
+- **In hàng loạt (`batch_all`)**: In tự động toàn bộ 4 bản vẽ `KT-01` $\rightarrow$ `KT-04` ra các file PDF chuẩn A3 trong thư mục chỉ định.
+- **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01`).
+* **Ví dụ ra lệnh**:
+  > *"In hàng loạt toàn bộ 4 bản vẽ KT-01 đến KT-04 ra các file PDF A3"* hoặc *"In riêng bản vẽ tường xây KT-01 ra file PDF"*
 
 ---
 

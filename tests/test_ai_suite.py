@@ -135,8 +135,31 @@ def test_inspector_compliance():
     assert len(res_fail["warnings"]) > 0
 
 
+def test_plotter_commands():
+    """Test standardized PDF plot command generation."""
+    from autocad_ai.core.plotter import build_plot_single_sheet_commands, build_batch_plot_commands
+
+    single = build_plot_single_sheet_commands(
+        sheet_code="KT-01",
+        window_p1=[-2000, -3000],
+        window_p2=[12000, 17000],
+        output_pdf_path="/tmp/test_kt01.pdf",
+        paper_size="A3",
+        plot_style="monochrome.ctb",
+    )
+    cmd_str = " ".join(single)
+    assert "-PLOT" in cmd_str
+    assert "DWG To PDF.pc3" in cmd_str
+    assert "ISO full bleed A3" in cmd_str
+    assert "monochrome.ctb" in cmd_str
+
+    batch = build_batch_plot_commands(output_directory="/tmp/cad_test_batch")
+    assert batch["sheet_count"] == 4
+    assert len(batch["pdf_files"]) == 4
+
+
 def test_servers_registration():
-    """Test that all 6 core business commands are registered on Mac and Win servers."""
+    """Test that all 7 core business commands are registered on Mac and Win servers."""
     expected_tools = {
         "cad_draw_new",
         "cad_modify",
@@ -144,6 +167,7 @@ def test_servers_registration():
         "cad_estimate",
         "cad_inspect",
         "cad_command",
+        "cad_plot",
     }
 
     mac_tools = {t.name for t in asyncio.run(mac_mcp.list_tools())}
@@ -151,3 +175,4 @@ def test_servers_registration():
 
     win_tools = {t.name for t in asyncio.run(win_mcp.list_tools())}
     assert expected_tools.issubset(win_tools)
+
