@@ -6,16 +6,19 @@ from typing import Dict, Any, List
 
 
 def is_autocad_running_mac() -> bool:
-    """Check if AutoCAD for Mac is running."""
-    try:
-        res = subprocess.run(["pgrep", "-if", "AutoCAD"], capture_output=True, text=True)
-        return res.returncode == 0 and len(res.stdout.strip()) > 0
-    except Exception:
-        return False
+    """Check if AutoCAD or any DWG CAD (ZWCAD, BricsCAD) is running on macOS."""
+    for cad_app in ("AutoCAD", "ZWCAD", "BricsCAD"):
+        try:
+            res = subprocess.run(["pgrep", "-if", cad_app], capture_output=True, text=True)
+            if res.returncode == 0 and len(res.stdout.strip()) > 0:
+                return True
+        except Exception:
+            continue
+    return False
 
 
 def dispatch_to_autocad_mac(commands: List[str]) -> Dict[str, Any]:
-    """Execute command list directly in active AutoCAD for Mac."""
+    """Execute command list directly in active AutoCAD / ZWCAD / BricsCAD for Mac."""
     if not commands:
         return {"status": "error", "message": "No commands provided"}
 
@@ -33,17 +36,17 @@ def dispatch_to_autocad_mac(commands: List[str]) -> Dict[str, Any]:
     if not is_running:
         return {
             "status": "warning",
-            "message": "AutoCAD for Mac is not running. Script written to queue.",
+            "message": "Phần mềm CAD (AutoCAD/ZWCAD/BricsCAD) chưa mở. File kịch bản đã được lưu sẵn.",
             "script_file": scr_file,
             "command_count": len(clean_cmds),
-            "how_to_run": f"Open AutoCAD for Mac -> Type 'SCRIPT' -> Select '{scr_file}'",
+            "how_to_run": f"Mở CAD lên -> Gõ lệnh 'SCRIPT' -> Chọn file '{scr_file}'",
         }
 
     try:
         as_script = f'''
         tell application "System Events"
-            set autocadProc to (first process whose name contains "AutoCAD")
-            set frontmost of autocadProc to true
+            set cadProc to (first process whose name contains "AutoCAD" or name contains "ZWCAD" or name contains "BricsCAD")
+            set frontmost of cadProc to true
             delay 0.15
             keystroke "_SCRIPT "
             delay 0.15
@@ -54,10 +57,11 @@ def dispatch_to_autocad_mac(commands: List[str]) -> Dict[str, Any]:
         subprocess.run(["osascript", "-e", as_script], capture_output=True, text=True)
         return {
             "status": "success",
-            "message": "Commands executed live on AutoCAD for Mac.",
+            "message": "Đã thực thi trực tiếp trên màn hình CAD (macOS).",
             "command_count": len(clean_cmds),
             "script_file": scr_file,
         }
+
     except Exception as e:
         return {
             "status": "partial_success",

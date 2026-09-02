@@ -35,29 +35,63 @@ def dispatch_to_autocad_win(commands: List[str]) -> Dict[str, Any]:
         }
 
     try:
+        # Multi-CAD Auto-Detection on Windows:
+        # 1. Autodesk AutoCAD (2021-2026)
+        # 2. ZWSOFT ZWCAD (2021-2026)
+        # 3. Gstarsoft GstarCAD
+        # 4. Bricsys BricsCAD
+        # 5. VinaCAD / EnjiCAD / IntelliCAD
         prog_ids = [
             "AutoCAD.Application",
+            "AutoCAD.Application.25.1",  # 2026
+            "AutoCAD.Application.25.0",  # 2025
             "AutoCAD.Application.24.3",  # 2024
             "AutoCAD.Application.24.2",  # 2023
             "AutoCAD.Application.24.1",  # 2022
             "AutoCAD.Application.24.0",  # 2021
-            "AutoCAD.Application.25.0",  # 2025
-            "AutoCAD.Application.25.1",  # 2026
+            "ZWCAD.Application",         # ZWCAD
+            "ZWCAD.Application.2025",
+            "ZWCAD.Application.2024",
+            "GstarCAD.Application",      # GstarCAD
+            "BricsCADApp.AcadApplication", # BricsCAD
+            "VinaCAD.Application",       # VinaCAD
+            "EnjiCAD.Application",       # EnjiCAD
+            "IntelliCAD.Application",    # IntelliCAD engine
         ]
         acad = None
+        active_cad_name = "AutoCAD"
         for pid in prog_ids:
             try:
                 acad = win32com.client.GetActiveObject(pid)
                 if acad:
+                    active_cad_name = pid.split(".")[0]
                     break
             except Exception:
                 continue
 
         if not acad:
-            acad = win32com.client.Dispatch("AutoCAD.Application")
-            acad.Visible = True
+            # Fallback dispatch
+            try:
+                acad = win32com.client.Dispatch("AutoCAD.Application")
+                acad.Visible = True
+            except Exception:
+                for alt_pid in ("ZWCAD.Application", "GstarCAD.Application", "BricsCADApp.AcadApplication"):
+                    try:
+                        acad = win32com.client.Dispatch(alt_pid)
+                        acad.Visible = True
+                        active_cad_name = alt_pid.split(".")[0]
+                        break
+                    except Exception:
+                        continue
+
+        if not acad:
+            return {
+                "status": "error",
+                "message": "Không tìm thấy phần mềm CAD nào đang mở (AutoCAD, ZWCAD, GstarCAD, VinaCAD, EnjiCAD). Hãy mở phần mềm CAD của bạn trước.",
+            }
 
         doc = acad.ActiveDocument
+
         for cmd in commands:
             c = cmd.strip()
             if c and not c.startswith(";;"):
