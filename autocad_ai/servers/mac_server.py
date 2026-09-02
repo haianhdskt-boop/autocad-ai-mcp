@@ -11,9 +11,27 @@ from autocad_ai.core.inspector import check_room_clear_dimensions, build_inspect
 from autocad_ai.core.plotter import build_plot_single_sheet_commands, build_batch_plot_commands
 from autocad_ai.drivers.mac_driver import dispatch_to_autocad_mac, is_autocad_running_mac
 
+SERVER_INSTRUCTIONS = """AutoCAD AI Professional Architect Suite (macOS).
+
+TUÂN THỦ NGHIÊM NGẶT 2 QUY TRÌNH CHUẨN CỦA KIẾN TRÚC SƯ:
+
+🏛️ QUY TRÌNH 1: THIẾT KẾ MỚI (5 BƯỚC)
+1. Bước 1 (Nạp nhiệm vụ): Tiếp nhận diện tích, công năng, sở thích, hình ảnh tham khảo từ KTS.
+2. Bước 2 (Đề xuất & Bàn bạc): Phân tích và đưa ra mô tả chi tiết phương án bố trí không gian, giao thông, cầu thang. DỪNG LẠI CHỜ KTS CHỐT PHƯƠNG ÁN trước khi vẽ.
+3. Bước 3 (Triển khai vẽ): Gọi 'cad_draw_new' vẽ trực tiếp lên AutoCAD theo đúng phương án đã chốt.
+4. Bước 4 (Tự kiểm tra): Tự động chạy 'cad_inspect' kiểm tra thông thủy, đối chiếu ý đồ chốt, tự sửa nếu có lệch.
+5. Bước 5 (Báo cáo hoàn thành): Báo cáo tóm tắt diện tích m2 và thông số hoàn thiện cho KTS.
+
+🔧 QUY TRÌNH 2: CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
+1. Bước 1 (Tiếp nhận yêu cầu): Lắng nghe phản hồi và chỉ dẫn chỉnh sửa từ KTS.
+2. Bước 2 (Thực hiện sửa): Gọi 'cad_modify' để Stretch, Move, Mirror, Rotate trực tiếp trên AutoCAD.
+3. Bước 3 (Tự kiểm tra lại): Kiểm tra không gian ảnh hưởng, đảm bảo không xung đột phòng lân cận.
+4. Bước 4 (Báo cáo hoàn thành): Zoom đến vị trí sửa và thông báo kích thước mới cho KTS.
+"""
+
 mcp = FastMCP(
     name="autocad-ai-mac",
-    instructions="AutoCAD AI Professional Architect Suite (macOS): 7 core business commands for live drafting, modification, multi-sheet construction documentation, detailed BOQ estimation, inspection, and standardized PDF plotting.",
+    instructions=SERVER_INSTRUCTIONS,
 )
 
 
@@ -216,10 +234,45 @@ def cad_plot(
         }
 
 
+# ============================================================================
+# WORKFLOW PROMPTS (QUY TRÌNH CHUẨN)
+# ============================================================================
+
+
+@mcp.prompt()
+def new_design_proposal(project_brief: str) -> str:
+    """Quy trình 1: Hướng dẫn AI tiếp nhận nhiệm vụ thiết kế, phân tích, đề xuất phương án và chờ KTS chốt."""
+    return f"""Bạn là Trợ lý Kiến Trúc Sư AI chuyên nghiệp. Hãy tuân thủ QUY TRÌNH THIẾT KẾ MỚI (5 BƯỚC) cho nhiệm vụ sau:
+Nhiệm vụ thiết kế: "{project_brief}"
+
+CÁC BƯỚC THỰC HIỆN:
+1. BƯỚC 1: Phân tích kỹ diện tích khu đất (rộng x dài), số tầng, nhu cầu các phòng, phong thủy, phong cách.
+2. BƯỚC 2 (QUAN TRỌNG): Lập bảng mô tả chi tiết phương án bố trí mặt bằng (phân bổ diện tích, vị trí thang, giếng trời, lối đi). DỪNG LẠI VÀ HỎI KIẾN TRÚC SƯ ĐỂ CHỐT PHƯƠNG ÁN. CHƯA ĐƯỢC VẼ KHI KTS CHƯA CHỐT!
+3. BƯỚC 3: Sau khi KTS đồng ý chốt, gọi 'cad_draw_new' vẽ trực tiếp lên AutoCAD.
+4. BƯỚC 4: Tự kiểm tra lại bằng 'cad_inspect' (kích thước thông thủy, đối chiếu ý đồ chốt) và tự sửa nếu có lệch.
+5. BƯỚC 5: Báo cáo hoàn thành bảng diện tích từng phòng cho KTS.
+"""
+
+
+@mcp.prompt()
+def modify_design_request(modification_brief: str) -> str:
+    """Quy trình 2: Hướng dẫn AI tiếp nhận yêu cầu chỉnh sửa từ KTS, sửa trực tiếp trên AutoCAD, tự kiểm tra và báo cáo."""
+    return f"""Bạn là Trợ lý Kiến Trúc Sư AI chuyên nghiệp. Hãy tuân thủ QUY TRÌNH CHỈNH SỬA (4 BƯỚC) cho yêu cầu sau:
+Yêu cầu chỉnh sửa: "{modification_brief}"
+
+CÁC BƯỚC THỰC HIỆN:
+1. BƯỚC 1: Phân tích đối tượng cần sửa và phạm vi ảnh hưởng (tường nào, phòng nào bị co giãn).
+2. BƯỚC 2: Gọi 'cad_modify' để thực hiện lệnh Stretch, Move, Mirror, Rotate trực tiếp trên AutoCAD.
+3. BƯỚC 3: Tự kiểm tra lại diện tích phòng mới và các không gian lân cận để đảm bảo không phát sinh xung đột.
+4. BƯỚC 4: Báo cáo hoàn thành, thông báo kích thước mới và zoom đến vị trí vừa sửa cho KTS xem.
+"""
+
+
 def main():
     mcp.run(transport="stdio")
 
 
 if __name__ == "__main__":
     main()
+
 

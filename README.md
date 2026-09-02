@@ -23,6 +23,44 @@ Chạy lệnh sau trong PowerShell (chỉ cài module COM ActiveX Windows):
 irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win.ps1 | iex
 ```
 
+## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP)
+
+Hệ thống được thiết kế vận hành theo đúng phương pháp luận làm việc của Kiến Trúc Sư:
+
+### 🏛️ 1. QUY TRÌNH THIẾT KẾ MỚI (5 BƯỚC)
+
+```mermaid
+flowchart TD
+    A["Bước 1: Nạp Nhiệm Vụ Thiết Kế\n(Khu đất, nhu cầu phòng, phong cách, ảnh mẫu)"] --> B["Bước 2: Phân Tích & Đề Xuất Bố Trí\n(Mô tả giao thông, không gian, số bậc thang)"]
+    B --> C{"KTS Chốt\nPhương Án?"}
+    C -- "Chưa / Cần chỉnh" --> B
+    C -- "ĐÃ CHỐT" --> D["Bước 3: Triển Khai Vẽ Trực Tiếp Trên AutoCAD\n(Gọi cad_draw_new theo đúng phân lớp layer)"]
+    D --> E["Bước 4: Tự Kiểm Tra (QA/QC) & Tự Hiệu Chỉnh\n(Đo thông thủy, đối chiếu ý đồ chốt)"]
+    E --> F["Bước 5: Báo Cáo Hoàn Thành Cho KTS\n(Bảng diện tích m2, thông số hoàn thiện)"]
+```
+
+1. **Bước 1: Nạp Nhiệm Vụ Thiết Kế**: KTS cung cấp kích thước đất, số tầng, danh sách phòng, sở thích/phong cách, ảnh tham khảo (trong thư mục hoặc gửi lên chat).
+2. **Bước 2: Phân Tích & Đề Xuất Phương Án**: AI phân tích và mô tả chi tiết phương án phân chia không gian, giao thông, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
+3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_draw_new` vẽ trực tiếp lên màn hình AutoCAD.
+4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động kiểm tra kích thước thông thủy, tiêu chuẩn phòng (`cad_inspect`), phát hiện và tự sửa lỗi nếu có lệch.
+5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích $m^2$ chi tiết từng phòng cho KTS nghiệm thu.
+
+---
+
+### 🔧 2. QUY TRÌNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
+
+```mermaid
+flowchart TD
+    M1["Bước 1: KTS Kiểm Tra & Yêu Cầu Chỉnh Sửa\n(Dịch tường, đổi kích thước, đảo cánh cửa)"] --> M2["Bước 2: AI Sửa Trực Tiếp Trên AutoCAD\n(Gọi cad_modify - Stretch, Move, Mirror)"]
+    M2 --> M3["Bước 3: Tự Kiểm Tra Lại Kết Quả\n(Đảm bảo không xung đột phòng lân cận)"]
+    M3 --> M4["Bước 4: Báo Cáo Hoàn Thành Cho KTS\n(Zoom đến vị trí vừa sửa, báo kích thước mới)"]
+```
+
+1. **Bước 1: Tiếp Nhận Phản Hồi**: KTS kiểm tra bản vẽ trên AutoCAD và đưa ra yêu cầu (ví dụ: *"Kéo phòng khách rộng thêm 500mm"*).
+2. **Bước 2: Thực Hiện Chỉnh Sửa**: AI gọi `cad_modify` để `STRETCH`, `MOVE`, `MIRROR` trực tiếp trên AutoCAD.
+3. **Bước 3: Tự Kiểm Tra Lại**: Đảm bảo việc dịch chuyển không gây hẹp hành lang hoặc xung đột các phòng lân cận.
+4. **Bước 4: Báo Cáo Hoàn Thành**: Zoom bản vẽ vào vị trí vừa sửa và thông báo kích thước mới cho KTS.
+
 ---
 
 ## 🏛️ TRỌN BỘ 7 LỆNH NGHIỆP VỤ CỐT LÕI
