@@ -102,10 +102,41 @@ def test_finalizer_all_11_sheets():
     assert "KT-11" in " ".join(s11)
 
     # Full set of all 11 sheets
-    s_full = build_finalized_sheets_commands("full_project_set", 5000, 15000, rooms)
+    s_full = build_finalized_sheets_commands(
+        "full_project_set",
+        5000,
+        15000,
+        floor_height_mm=3800.0,
+        num_floors=2,
+        num_risers=21,
+        rooms=rooms,
+    )
     s_full_str = " ".join(s_full)
     for code in ["KT-01", "KT-02", "KT-03", "KT-04", "KT-05", "KT-06", "KT-07", "KT-08", "KT-09", "KT-10", "KT-11"]:
         assert code in s_full_str
+
+
+def test_dynamic_stairs_and_pagination():
+    """Test dynamic stair calculation and dynamic door pagination."""
+    from autocad_ai.core.finalizer import calculate_stair_parameters, build_door_details_paginated_commands
+
+    # Dynamic stair check
+    stair_3600 = calculate_stair_parameters(floor_height_mm=3600.0, num_risers=21)
+    assert stair_3600["riser_height_mm"] == 171.4
+    assert 240 <= stair_3600["tread_width_mm"] <= 300
+
+    stair_3900 = calculate_stair_parameters(floor_height_mm=3900.0, num_risers=23)
+    assert stair_3900["riser_height_mm"] == 169.6
+
+    # Dynamic door pagination (10 doors -> 4 A3 sheets)
+    doors_10 = [{"code": f"D{i}", "name": f"Door {i}", "width": 900, "height": 2200} for i in range(1, 11)]
+    door_res = build_door_details_paginated_commands(doors_10, max_doors_per_sheet=3)
+    assert door_res["total_doors"] == 10
+    assert door_res["sheet_count"] == 4
+    assert len(door_res["sheets"]) == 4
+    assert door_res["sheets"][0]["code"] == "KT-11.01"
+    assert door_res["sheets"][3]["code"] == "KT-11.04"
+
 
 
 

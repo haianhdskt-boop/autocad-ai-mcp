@@ -89,28 +89,35 @@ def cad_finalize_drawing(
     sheet_type: str = "full_project_set",
     frontage_width_mm: float = 5000.0,
     depth_length_mm: float = 15000.0,
+    floor_height_mm: float = 3600.0,
+    num_floors: int = 2,
+    num_risers: int = 21,
     rooms: Optional[List[Dict[str, Any]]] = None,
+    doors: Optional[List[Dict[str, Any]]] = None,
+    wc_count: int = 2,
     project_name: str = "Nhà Phố Dân Dụng",
     origin_x: float = 0.0,
     origin_y: float = 0.0,
 ) -> Dict[str, Any]:
     """
     3. HOÀN THIỆN BỘ HỒ SƠ THI CÔNG KIẾN TRÚC (cad_finalize_drawing):
-    Tự động hoàn thiện và dàn trang trọn bộ 11 bản vẽ kỹ thuật thi công chuẩn A3:
+    Tự động phân trang và hoàn thiện trọn bộ bản vẽ kỹ thuật thi công chuẩn A3:
+    - Tính toán ĐỘNG thông số cầu thang: Chiều cao cổ bậc h = H / N (ví dụ 3600/21 = 171.4mm, 3900/23 = 169.5mm), mặt bậc b theo công thức Blondel.
+    - Phân trang ĐỘNG chi tiết cửa: Tự động chia tối đa 3-4 bộ cửa / 1 tờ A3 để đảm bảo tỷ lệ 1/25 rõ nét (KT-11.01, KT-11.02...).
     - sheet_type:
-        * 'full_project_set' / 'all': Dàn trang trọn bộ toàn bộ 11 bản vẽ thi công (KT-01 đến KT-11)
-        * 'all_floor_plans': Dàn trang bộ 4 mặt bằng tầng (KT-01 đến KT-04)
-        * 'wall_construction': KT-01 Kích thước tường xây (DIM 3 lớp, hatch tường gạch, không nội thất)
-        * 'floor_finishes': KT-02 Định vị & ốp lát sàn (cao độ phòng, mốc lát đầu tiên, mũi tên độ dốc WC)
-        * 'furniture_layout': KT-03 Bố trí nội thất, tag mã hiệu đồ, diện tích phòng & bảng thống kê
-        * 'door_window_schedule': KT-04 Định vị cửa, tag D1/S1, bảng kích thước & cốt bậu dưới/lanh-tô
-        * 'elevation': KT-05 Mặt đứng chính công trình (cốt cao độ các tầng, chỉ dẫn vật liệu ngoại thất)
-        * 'section': KT-06 Mặt cắt dọc 1-1 qua thang & giếng trời (cấu tạo sàn, chiều cao thông thủy)
-        * 'ceiling_lighting': KT-07 Mặt bằng trần thạch cao giật cấp & bố trí đèn downlight LED
-        * 'roof_drainage': KT-08 Mặt bằng mái, độ dốc thu nước sê-nô & vị trí bồn nước
-        * 'stair_detail': KT-09 Chi tiết bậc thang, mặt bậc gỗ, lan can kính & tay vịn
-        * 'wc_detail': KT-10 Chi tiết phòng vệ sinh trích 1/25 & triển khai 4 vách ốp lát
-        * 'door_detail': KT-11 Chi tiết cấu tạo cửa đi D1, D2 và cửa sổ S1
+        * 'full_project_set' / 'all': Dàn trang toàn bộ hồ sơ thi công động.
+        * 'all_floor_plans': Dàn trang bộ 4 mặt bằng tầng (KT-01 đến KT-04).
+        * 'wall_construction': KT-01 Kích thước tường xây.
+        * 'floor_finishes': KT-02 Định vị & ốp lát sàn, mốc lát, độ dốc.
+        * 'furniture_layout': KT-03 Bố trí nội thất & bảng thống kê.
+        * 'door_window_schedule': KT-04 Định vị cửa & bảng bậu/lanh-tô.
+        * 'elevation': KT-05 Mặt đứng chính công trình kèm vật liệu.
+        * 'section': KT-06 Mặt cắt dọc 1-1 qua thang.
+        * 'ceiling_lighting': KT-07 Mặt bằng trần thạch cao & đèn.
+        * 'roof_drainage': KT-08 Mặt bằng mái & thoát nước.
+        * 'stair_detail': KT-09 Chi tiết thang tính động h và b.
+        * 'wc_detail': KT-10 Chi tiết WC trích 1/25 & 4 vách.
+        * 'door_detail': KT-11 Chi tiết cấu tạo cửa phân trang động.
     """
     room_list = rooms or [
         {"name": "SÂN TRƯỚC", "y_start": 0, "y_end": 2500, "type": "yard"},
@@ -122,8 +129,13 @@ def cad_finalize_drawing(
     cmds = build_finalized_sheets_commands(
         sheet_type=sheet_type,
         width_mm=frontage_width_mm,
-        length_mm=depth_length_mm,
+        depth_length_mm=depth_length_mm,
+        floor_height_mm=floor_height_mm,
+        num_floors=num_floors,
+        num_risers=num_risers,
         rooms=room_list,
+        doors=doors,
+        wc_count=wc_count,
         origin_x=origin_x,
         origin_y=origin_y,
         project_name=project_name,

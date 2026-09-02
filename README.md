@@ -27,37 +27,18 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 ## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP)
 
-Hệ thống được thiết kế vận hành theo đúng phương pháp luận làm việc của Kiến Trúc Sư:
+Hệ thống vận hành theo 2 quy trình chuẩn mực của Kiến Trúc Sư:
 
 ### 🏛️ 1. QUY TRÌNH THIẾT KẾ MỚI (5 BƯỚC)
-
-```mermaid
-flowchart TD
-    A["Bước 1: Nạp Nhiệm Vụ Thiết Kế\n(Khu đất, nhu cầu phòng, phong cách, ảnh mẫu)"] --> B["Bước 2: Phân Tích & Đề Xuất Bố Trí\n(Mô tả giao thông, không gian, số bậc thang)"]
-    B --> C{"KTS Chốt\nPhương Án?"}
-    C -- "Chưa / Cần chỉnh" --> B
-    C -- "ĐÃ CHỐT" --> D["Bước 3: Triển Khai Vẽ Trực Tiếp Trên AutoCAD\n(Gọi cad_draw_new theo đúng phân lớp layer)"]
-    D --> E["Bước 4: Tự Kiểm Tra (QA/QC) & Tự Hiệu Chỉnh\n(Đo thông thủy, đối chiếu ý đồ chốt)"]
-    E --> F["Bước 5: Báo Cáo Hoàn Thành Cho KTS\n(Bảng diện tích m2, thông số hoàn thiện)"]
-```
-
-1. **Bước 1: Nạp Nhiệm Vụ Thiết Kế**: KTS cung cấp kích thước đất, số tầng, danh sách phòng, sở thích/phong cách, ảnh tham khảo (trong thư mục hoặc gửi lên chat).
+1. **Bước 1: Nạp Nhiệm Vụ Thiết Kế**: KTS cung cấp kích thước đất, số tầng, danh sách phòng, sở thích/phong cách, ảnh tham khảo.
 2. **Bước 2: Phân Tích & Đề Xuất Phương Án**: AI phân tích và mô tả chi tiết phương án phân chia không gian, giao thông, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
-3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_draw_new` vẽ trực tiếp lên màn hình AutoCAD.
+3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_draw_new` vẽ trực tiếp lên AutoCAD theo đúng layer chuẩn.
 4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động kiểm tra kích thước thông thủy, tiêu chuẩn phòng (`cad_inspect`), phát hiện và tự sửa lỗi nếu có lệch.
 5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích m2 chi tiết từng phòng cho KTS nghiệm thu.
 
 ---
 
 ### 🔧 2. QUY TRÌNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
-
-```mermaid
-flowchart TD
-    M1["Bước 1: KTS Kiểm Tra & Yêu Cầu Chỉnh Sửa\n(Dịch tường, đổi kích thước, đảo cánh cửa)"] --> M2["Bước 2: AI Sửa Trực Tiếp Trên AutoCAD\n(Gọi cad_modify - Stretch, Move, Mirror)"]
-    M2 --> M3["Bước 3: Tự Kiểm Tra Lại Kết Quả\n(Đảm bảo không xung đột phòng lân cận)"]
-    M3 --> M4["Bước 4: Báo Cáo Hoàn Thành Cho KTS\n(Zoom đến vị trí vừa sửa, báo kích thước mới)"]
-```
-
 1. **Bước 1: Tiếp Nhận Phản Hồi**: KTS kiểm tra bản vẽ trên AutoCAD và đưa ra yêu cầu (ví dụ: *"Kéo phòng khách rộng thêm 500mm"*).
 2. **Bước 2: Thực Hiện Chỉnh Sửa**: AI gọi `cad_modify` để `STRETCH`, `MOVE`, `MIRROR` trực tiếp trên AutoCAD.
 3. **Bước 3: Tự Kiểm Tra Lại**: Đảm bảo việc dịch chuyển không gây hẹp hành lang hoặc xung đột các phòng lân cận.
@@ -75,7 +56,7 @@ flowchart TD
             GIAI ĐOẠN THIẾT KẾ & SỬA ĐỔI            GIAI ĐOẠN HỒ SƠ, DỰ TOÁN & IN ẤN
             ┌────────────────────────────┐          ┌────────────────────────────┐
             │ 1. ✍️ cad_draw_new         │          │ 3. 📐 cad_finalize_drawing │
-            │ (Vẽ mới không gian/tường)  │          │ (Dàn trang 11 bản vẽ TKTC) │
+            │ (Vẽ mới không gian/tường)  │          │ (Dàn trang động theo TKTC) │
             │                            │          │                            │
             │ 2. 🔧 cad_modify           │          │ 4. 📊 cad_estimate         │
             │ (Sửa, dịch tường, đổi cửa) │          │ (Bóc dự toán chi tiết Excel│
@@ -101,27 +82,19 @@ Hiệu chỉnh, di dời mảng tường, co giãn kích thước phòng (`STRET
 * **Ví dụ ra lệnh**:
   > *"Kéo rộng phòng khách lùi về phía sau thêm 500mm và đổi cánh cửa phòng ngủ mở vào trong tường."*
 
-### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Trọn Bộ Hồ Sơ Thi Công (11 Bản Vẽ Chuẩn TKTC)
-Tự động hoàn thiện, phân tách và dàn trang trọn bộ **11 bản vẽ kỹ thuật thi công kiến trúc** lồng sẵn khung tên chuẩn A3 theo 5 nhóm chuyên biệt:
+### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Hồ Sơ Thi Công (Phân Trang Động & Tính Toán Công Thái Học)
+Hệ thống **TỰ ĐỘNG PHÂN TRANG THEO KHỐI LƯỢNG THỰC TẾ** (không khống chế cứng số lượng trang A3 để đảm bảo bản vẽ in ra luôn rõ nét ở tỷ lệ kỹ thuật):
 
-* **Nhóm 1: Hệ thống Mặt Bằng Các Tầng**:
-  - **`KT-01` (Kích thước tường xây)**: Tắt nội thất, DIM 3 lớp (chi tiết, tim trục, phủ bì), hatch tường gạch, ghi chú tường 220/110.
-  - **`KT-02` (Định vị & Ốp lát sàn)**: Tắt nội thất, ghi chú cao độ phòng (`+0.450`), đánh dấu điểm mốc lát đầu tiên, mũi tên dốc thoát sàn ($i=1.5\%$) WC/ban công.
-  - **`KT-03` (Bố trí nội thất)**: Đầy đủ đồ nội thất, tag mã hiệu (`SF1`, `TV1`, `BA1`), tên phòng, diện tích thông thủy ($m^2$), bảng thống kê nội thất.
-  - **`KT-04` (Định vị & Phân loại cửa)**: Lỗ mở cửa thô, tag cửa tròn `D1`, `D2`, `S1`, Bảng chỉ dẫn thông số (Rộng x Cao, Cốt bậu dưới Sill Height, Cốt lanh-tô Header Height, vật liệu).
-* **Nhóm 2: Mặt Đứng & Mặt Cắt Công Trình**:
-  - **`KT-05` (Mặt đứng chính công trình)**: Toàn bộ mặt tiền kiến trúc, cao độ các tầng, ban công, mái, chỉ dẫn vật liệu (đá granite, lam nhôm, sơn ngoại thất).
-  - **`KT-06` (Mặt cắt dọc 1-1 qua thang)**: Cắt qua thang và giếng trời, thể hiện cấu tạo sàn, chiều cao thông thủy, lanh-tô.
-* **Nhóm 3: Mặt Bằng Trần Đèn & Thoát Nước Mái**:
-  - **`KT-07` (Mặt bằng Trần thạch cao & Đèn)**: Trần giật cấp, cao độ hạ trần, khe hắt LED, lưới đèn downlight D90 9W.
-  - **`KT-08` (Mặt bằng Mái & Thoát nước)**: Độ dốc thoát nước mái $i=2\%$ về sê-nô, lớp chống thấm, vị trí đặt bồn nước & thái dương năng.
-* **Nhóm 4: Hệ Thống Chi Tiết Kiến Trúc Chuyên Sâu**:
-  - **`KT-09` (Chi tiết Cầu Thang & Lan can)**: Chi tiết mặt bậc gỗ $h=171\text{mm}, b=260\text{mm}$, mũi bậc bo tròn R10, cổ bậc ốp đá trắng, lan can kính tay vịn gỗ.
-  - **`KT-10` (Chi tiết Phòng Vệ Sinh)**: Mặt bằng trích WC tỷ lệ 1/25 và mặt cắt triển khai 4 vách tường ốp lát gạch kèm cốt sen tắm, lavabo, bệt.
-  - **`KT-11` (Chi tiết Cấu Tạo Cửa)**: Chi tiết cửa đi chính D1 (4 cánh), cửa sổ trượt S1 (2 cánh) kèm quy cách đố cửa & phụ kiện.
-
-* **Ví dụ ra lệnh**:
-  > *"Xuất trọn bộ 11 bản vẽ thi công kiến trúc A3 cho công trình"* (hoặc *"Xuất riêng mặt đứng chính và mặt cắt 1-1 qua thang"*).
+* **Tính toán động Cầu thang (`KT-09`)**:
+  - Chiều cao cổ bậc tính động: $h = \frac{H_{\text{tầng}}}{N_{\text{cổ bậc}}}$ (Ví dụ: Tầng cao 3.6m có 21 bậc $\rightarrow h = 171.4\text{mm}$; Tầng 3.9m có 23 bậc $\rightarrow h = 169.5\text{mm}$; Tầng 4.2m có 25 bậc $\rightarrow h = 168.0\text{mm}$).
+  - Bề rộng mặt bậc $b$ tính theo quy tắc công thái học Blondel $2h + b \approx 600..640\text{mm}$.
+* **Phân trang động Chi tiết cửa (`KT-11.01`, `KT-11.02`...)**:
+  - Mỗi tờ A3 chỉ chứa tối đa 3-4 bộ cửa để đảm bảo tỷ lệ $1/25$ đọc rõ nét. Nếu công trình có 12 loại cửa, hệ thống sẽ tự động tách thành 4 tờ A3 riêng biệt.
+* **Hệ thống các nhóm bản vẽ thi công**:
+  - **Nhóm Mặt bằng**: `KT-01` (Tường xây), `KT-02` (Ốp lát sàn & mốc lát, độ dốc), `KT-03` (Bố trí nội thất & bảng thống kê), `KT-04` (Định vị cửa & bảng bậu/lanh-tô).
+  - **Nhóm Mặt đứng & Mặt cắt**: `KT-05` (Mặt đứng chính công trình kèm vật liệu), `KT-06` (Mặt cắt dọc 1-1 qua thang).
+  - **Nhóm Trần & Mái**: `KT-07` (Trần thạch cao giật cấp & đèn LED), `KT-08` (Mặt bằng mái & thoát nước sê-nô).
+  - **Nhóm Chi tiết chuyên sâu**: `KT-09` (Chi tiết thang tính động $h, b$), `KT-10` (Chi tiết WC trích 1/25 & 4 vách), `KT-11` (Chi tiết cửa phân trang động).
 
 ### 4️⃣ `cad_estimate` — Bóc Tách Dự Toán Thi Công Chi Tiết (BOQ)
 Tính toán khối lượng toàn diện theo định mức xây dựng Việt Nam và xuất file **Excel / CSV**:
@@ -144,10 +117,10 @@ Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.R
 
 ### 7️⃣ `cad_plot` — In & Xuất Hồ Sơ PDF Chuẩn Nét Kỹ Thuật
 In trực tiếp từ AutoCAD ra file **PDF A3/A2** với phân cấp độ dày nét chuẩn (`monochrome.ctb` in đen trắng, tường/cột $0.40\text{mm}$, nét thấy $0.20\text{mm}$, dim/trục $0.13\text{mm}$, hatch $0.09\text{mm}$):
-- **In hàng loạt (`batch_all`)**: In tự động toàn bộ 11 bản vẽ `KT-01` -> `KT-11` (hoặc bộ 4 mặt bằng `KT-01` -> `KT-04`) ra các file PDF chuẩn A3 trong thư mục chỉ định.
-- **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01`, `KT-05`, `KT-09`).
+- **In hàng loạt (`batch_all`)**: In tự động toàn bộ các trang bản vẽ đã sinh ra file PDF chuẩn A3 trong thư mục chỉ định.
+- **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01.01`, `KT-05`, `KT-09`, `KT-11.01`).
 * **Ví dụ ra lệnh**:
-  > *"In hàng loạt trọn bộ 11 bản vẽ thi công ra các file PDF A3"* hoặc *"In riêng bản vẽ mặt đứng KT-05 ra file PDF"*
+  > *"In hàng loạt toàn bộ hồ sơ thi công ra các file PDF A3"* hoặc *"In riêng bản vẽ mặt đứng KT-05 ra file PDF"*
 
 ---
 
