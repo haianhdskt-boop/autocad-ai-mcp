@@ -225,8 +225,42 @@ def test_plotter_commands():
 
 
 
+def test_knowledge_engine():
+    """Test in-code architectural reference library extraction engine."""
+    from autocad_ai.knowledge.engine import (
+        get_library_topics,
+        get_full_topic_document,
+        search_reference_library,
+        get_room_guidelines,
+    )
+
+    # 1. List topics
+    topics = get_library_topics()
+    assert len(topics) >= 7
+    categories = [t["category"] for t in topics]
+    assert "01-tieu-chuan-khong-gian" in categories
+    assert "03-he-thong-mep-dien-nuoc" in categories
+
+    # 2. Get room guidelines
+    kitchen_guide = get_room_guidelines("kitchen")
+    assert "guideline_markdown" in kitchen_guide
+    assert "Tam giác" in kitchen_guide["guideline_markdown"] or "Bếp" in kitchen_guide["guideline_markdown"]
+
+    stair_guide = get_room_guidelines("stairs")
+    assert "cau-thang-va-hanh-lang.md" == stair_guide["target_document"]
+
+    # 3. Search reference library
+    search_res = search_reference_library("100mm")
+    assert len(search_res) > 0
+
+    # 4. Get specific topic document
+    doc = get_full_topic_document("cau-thang-va-hanh-lang")
+    assert doc is not None
+    assert "Blondel" in doc["content"]
+
+
 def test_servers_registration():
-    """Test that all 7 core business commands are registered on Mac and Win servers."""
+    """Test that all 8 core business commands are registered on Mac and Win servers."""
     expected_tools = {
         "cad_draw_new",
         "cad_modify",
@@ -235,11 +269,16 @@ def test_servers_registration():
         "cad_inspect",
         "cad_command",
         "cad_plot",
+        "cad_reference_guide",
     }
 
-    mac_tools = {t.name for t in asyncio.run(mac_mcp.list_tools())}
-    assert expected_tools.issubset(mac_tools)
+    from autocad_ai.servers.mac_server import mcp as mac_mcp
+    from autocad_ai.servers.win_server import mcp as win_mcp
 
+    import asyncio
+    mac_tools = {t.name for t in asyncio.run(mac_mcp.list_tools())}
     win_tools = {t.name for t in asyncio.run(win_mcp.list_tools())}
+
+    assert expected_tools.issubset(mac_tools)
     assert expected_tools.issubset(win_tools)
 

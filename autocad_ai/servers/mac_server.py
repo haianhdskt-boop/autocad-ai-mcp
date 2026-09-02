@@ -283,6 +283,39 @@ def cad_plot(
         }
 
 
+@mcp.tool()
+def cad_reference_guide(
+    action: str = "get_room",
+    query: str = "living",
+) -> Dict[str, Any]:
+    """
+    8. TRA CỨU QUY CHUẨN & HƯỚNG DẪN THIẾT KẾ (cad_reference_guide):
+    Trích xuất tức thì các hướng dẫn, tiêu chuẩn công thái học & quy chuẩn kỹ thuật từ thư viện mã nguồn kiến trúc:
+    - action:
+        * 'get_room': Lấy hướng dẫn chi tiết cho 1 phòng ('khach', 'bep', 'wc', 'ngu', 'master', 'thang', 'gieng_troi', 'gara').
+        * 'search': Tìm kiếm nhanh từ khóa (ví dụ: 'tam giác bếp', 'cổ bậc', 'quy tắc 100mm', 'độ dốc ram', 'chống thấm').
+        * 'get_topic': Lấy toàn bộ chuyên đề theo tên file (ví dụ: 'cau-thang-va-hanh-lang', 'he-thong-cap-thoat-nuoc', 'ket-cau-be-tong-cot-thep').
+        * 'list_all': Liệt kê toàn bộ 7 nhóm chuyên đề có trong thư viện mã nguồn.
+    """
+    from autocad_ai.knowledge.engine import (
+        get_library_topics,
+        get_full_topic_document,
+        search_reference_library,
+        get_room_guidelines,
+    )
+
+    if action == "list_all":
+        return {"topics": get_library_topics()}
+    elif action == "search":
+        return {"keyword": query, "results": search_reference_library(query)}
+    elif action == "get_topic":
+        doc = get_full_topic_document(query)
+        return doc or {"error": f"Không tìm thấy chuyên đề '{query}'"}
+    else:  # get_room
+        return get_room_guidelines(query)
+
+
+
 # ============================================================================
 # WORKFLOW PROMPTS (QUY TRÌNH CHUẨN)
 # ============================================================================

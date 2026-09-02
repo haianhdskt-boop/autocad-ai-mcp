@@ -5,7 +5,7 @@
 [![Platforms](https://img.shields.io/badge/Platforms-macOS%20%7C%20Windows-lightgrey.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)]()
 
-Hệ sinh thái **Model Context Protocol (MCP)** chuyên biệt hóa dành cho **Kiến Trúc Sư & Kỹ Sư Xây Dựng**. Điều khiển và tương tác trực tiếp theo thời gian thực trên màn hình **AutoCAD (2021 - 2026)** trên cả **macOS** và **Windows**.
+Hệ sinh thái **Model Context Protocol (MCP)** chuyên biệt hóa dành cho **Kiến Trúc Sư & Kỹ Sư Xây Dựng**. Đã đóng gói trực tiếp toàn bộ kho dữ liệu quy chuẩn kiến trúc [architecture-reference-library](https://github.com/haianhdskt-boop/architecture-reference-library) vào mã nguồn (`autocad_ai/knowledge/`), điều khiển và tương tác theo thời gian thực trên màn hình **AutoCAD (2021 - 2026)** trên cả **macOS** và **Windows**.
 
 ---
 
@@ -25,15 +25,39 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 ---
 
-## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP)
+## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP) & BỘ QUY CHUẨN TRƯỚC KHI VẼ
 
-Hệ thống vận hành theo 2 quy trình chuẩn mực của Kiến Trúc Sư:
+Hệ thống vận hành theo 2 quy trình chuẩn mực, kiểm soát nghiêm ngặt các ngưỡng thông thủy công thái học:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│               BẢNG THÔNG SỐ CÔNG THÁI HỌC & KÍCH THƯỚC TỐI THIỂU            │
+├───────────────────────┬───────────────────────────────┬─────────────────────┤
+│ HẠNG MỤC KHÔNG GIAN   │ KÍCH THƯỚC THÔNG THỦY TỐI THIỂU│ TIÊU CHUẨN THAM CHIẾU│
+├───────────────────────┼───────────────────────────────┼─────────────────────┤
+│ 1. Hành lang chính    │ Rộng >= 1100mm (phụ >= 900mm) │ Neufert & QCVN 04   │
+│ 2. Cầu thang bộ       │ Vế thang >= 900mm; Chiếu nghỉ │ h = H/N (150-175mm) │
+│                       │ >= 900mm; b = 250mm           │ b_hoàn thiện = 270mm│
+│ 3. Lan can an toàn    │ Cao >= 900mm (vế), >= 1100mm  │ Khe hở nan đứng     │
+│                       │ (thông tầng); Nan đứng <= 100mm│ an toàn trẻ em <=100│
+│ 4. Phòng Khách        │ Diện tích >= 16m2; Rộng >=3.6m│ Cự ly xem TV >= 2.5m│
+│ 5. Bếp & Phòng Ăn     │ Diện tích >= 12m2; Lối đi bếp │ Tam giác công năng  │
+│                       │ >= 1000..1200mm; Bàn-tường 800│ Chu vi 4.0 - 7.5m   │
+│ 6. Phòng Ngủ Master   │ Diện tích >= 14m2; Rộng >=3.3m│ Hở 2 bên giường 700 │
+│ 7. Phòng Ngủ Đơn/Con  │ Diện tích >= 9m2; Rộng >= 2.7m│ Kê giường 1.2 - 1.4m│
+│ 8. Vệ Sinh Tiêu Chuẩn │ Diện tích >= 3.2m2; Rộng >=1.4m│ Bệt hở trước >=600mm│
+│                       │ Khoang tắm đứng >= 900x900mm  │ Hạ cốt sàn 30-50mm  │
+│ 9. Giếng trời / Thông │ Nhà sâu >= 12m: Bắt buộc có ô │ Hiệu ứng ống khói   │
+│    tầng lấy sáng      │ thang/giếng trời >= 5% sàn    │ Stack Effect        │
+│ 10. Gara ô tô         │ Rộng >= 3.0m x Dài >= 5.5m    │ Độ dốc ram <= 15%   │
+└───────────────────────┴───────────────────────────────┴─────────────────────┘
+```
 
 ### 🏛️ 1. QUY TRÌNH THIẾT KẾ MỚI (5 BƯỚC)
 1. **Bước 1: Nạp Nhiệm Vụ Thiết Kế**: KTS cung cấp kích thước đất, số tầng, danh sách phòng, sở thích/phong cách, ảnh tham khảo.
-2. **Bước 2: Phân Tích & Đề Xuất Phương Án**: AI phân tích và mô tả chi tiết phương án phân chia không gian, giao thông, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
+2. **Bước 2: Phân Tích Quy Chuẩn & Đề Xuất Bố Trí**: AI đối chiếu quy chuẩn, lập mô tả chi tiết phương án phân chia không gian, giao thông, giếng trời, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
 3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_draw_new` vẽ trực tiếp lên AutoCAD theo đúng layer chuẩn.
-4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động kiểm tra kích thước thông thủy, tiêu chuẩn phòng (`cad_inspect`), phát hiện và tự sửa lỗi nếu có lệch.
+4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động chạy `cad_inspect` (action: `audit_full_plan`) kiểm tra kích thước thông thủy, an toàn lan can, tự động nắn chỉnh nếu phát hiện sai lệch.
 5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích m2 chi tiết từng phòng cho KTS nghiệm thu.
 
 ---
@@ -41,12 +65,12 @@ Hệ thống vận hành theo 2 quy trình chuẩn mực của Kiến Trúc Sư:
 ### 🔧 2. QUY TRÌNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
 1. **Bước 1: Tiếp Nhận Phản Hồi**: KTS kiểm tra bản vẽ trên AutoCAD và đưa ra yêu cầu (ví dụ: *"Kéo phòng khách rộng thêm 500mm"*).
 2. **Bước 2: Thực Hiện Chỉnh Sửa**: AI gọi `cad_modify` để `STRETCH`, `MOVE`, `MIRROR` trực tiếp trên AutoCAD.
-3. **Bước 3: Tự Kiểm Tra Lại**: Đảm bảo việc dịch chuyển không gây hẹp hành lang hoặc xung đột các phòng lân cận.
+3. **Bước 3: Tự Kiểm Tra Lại**: Đảm bảo việc nới rộng phòng này không làm phòng bên cạnh bị bóp hẹp dưới ngưỡng diện tích tối thiểu.
 4. **Bước 4: Báo Cáo Hoàn Thành**: Zoom bản vẽ vào vị trí vừa sửa và thông báo kích thước mới cho KTS.
 
 ---
 
-## 🏛️ TRỌN BỘ 7 LỆNH NGHIỆP VỤ CỐT LÕI
+## 🏛️ TRỌN BỘ 8 LỆNH NGHIỆP VỤ CỐT LÕI
 
 ```
                   ┌─────────────────────────────────────────────────────────────┐
@@ -60,10 +84,11 @@ Hệ thống vận hành theo 2 quy trình chuẩn mực của Kiến Trúc Sư:
             │                            │          │                            │
             │ 2. 🔧 cad_modify           │          │ 4. 📊 cad_estimate         │
             │ (Sửa, dịch tường, đổi cửa) │          │ (Bóc dự toán chi tiết Excel│
-            └────────────────────────────┘          │                            │
-                                 │                  │ 7. 🖨️ cad_plot             │
-                                 │                  │ (In PDF đen trắng nét chuẩn│
-                                 │                  └────────────────────────────┘
+            │                            │          │                            │
+            │ 8. 📚 cad_reference_guide  │          │ 7. 🖨️ cad_plot             │
+            │ (Tra cứu quy chuẩn tức thì)│          │ (In PDF đen trắng nét chuẩn│
+            └────────────────────────────┘          └────────────────────────────┘
+                                 │                               │
                                  ├───────────────────────────────┤
                                  │ 5. 🔍 cad_inspect (Đo đạc/lỗi)│
                                  │ 6. ⚡ cad_command (Lệnh CAD)  │
@@ -98,19 +123,17 @@ Hệ thống **TỰ ĐỘNG PHÂN TRANG THEO KHỐI LƯỢNG THỰC TẾ** (khô
 
 ### 4️⃣ `cad_estimate` — Bóc Tách Dự Toán Thi Công Chi Tiết (BOQ)
 Tính toán khối lượng toàn diện theo định mức xây dựng Việt Nam và xuất file **Excel / CSV**:
-- Bê tông móng, cột, dầm, sàn ($m^3$).
-- Ván khuôn phủ phim ($m^2$).
-- Cốt thép chi tiết các loại (Tấn / kg).
+- Bê tông móng, cột, dầm, sàn ($m^3$), ván khuôn ($m^2$), cốt thép (Tấn).
 - Xây tường bao gạch ống 220 ($m^3$) & tường ngăn 110 ($m^2$) đã trừ diện tích cửa.
 - Trát tường trong/ngoài ($m^2$), ốp lát gạch nền/WC ($m^2$), sơn bả 3 lớp ($m^2$), trần thạch cao ($m^2$), hệ thống cửa ($m^2$).
 - Thiết bị điện chiếu sáng/ổ cắm, thiết bị vệ sinh cấp thoát nước.
 * **Ví dụ ra lệnh**:
   > *"Lập bảng dự toán chi tiết công trình 2 tầng 5x15m cao 3.6m xuất ra file Excel du_toan.csv"*
 
-### 5️⃣ `cad_inspect` — Kiểm Tra Diện Tích & Lỗi Bản Vẽ
-Kiểm tra diện tích thông thủy, kích thước lọt lòng theo tiêu chuẩn công thái học kiến trúc và chạy lệnh Audit / Purge dọn sạch file rác.
+### 5️⃣ `cad_inspect` — Rà Soát Toàn Bộ Mặt Bằng & Dọn Rác Bản Vẽ
+Rà soát toàn diện mặt bằng (`audit_full_plan`) đối chiếu với toàn bộ tiêu chuẩn công thái học kiến trúc và chạy lệnh Audit / Purge dọn sạch file rác.
 * **Ví dụ ra lệnh**:
-  > *"Kiểm tra kích thước thông thủy phòng khách và dọn rác bản vẽ."*
+  > *"Kiểm tra toàn bộ mặt bằng xem có phòng nào bị hẹp dưới chuẩn không và dọn rác bản vẽ."*
 
 ### 6️⃣ `cad_command` — Gửi Lệnh AutoCAD Gốc
 Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.REGENALL`.
@@ -119,8 +142,14 @@ Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.R
 In trực tiếp từ AutoCAD ra file **PDF A3/A2** với phân cấp độ dày nét chuẩn (`monochrome.ctb` in đen trắng, tường/cột $0.40\text{mm}$, nét thấy $0.20\text{mm}$, dim/trục $0.13\text{mm}$, hatch $0.09\text{mm}$):
 - **In hàng loạt (`batch_all`)**: In tự động toàn bộ các trang bản vẽ đã sinh ra file PDF chuẩn A3 trong thư mục chỉ định.
 - **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01.01`, `KT-05`, `KT-09`, `KT-11.01`).
+
+### 8️⃣ `cad_reference_guide` — Tra Cứu Quy Chuẩn & Công Thái Học Tức Thì
+Trích xuất tức thì hướng dẫn chi tiết từ kho 7 chuyên đề kiến trúc được đóng gói trực tiếp trong mã nguồn:
+- Tra cứu theo phòng (`action: 'get_room'`, `query: 'bep'`): Lấy kích thước tam giác công năng, cự ly lối đi.
+- Tra cứu từ khóa (`action: 'search'`, `query: 'quy tắc 100mm'`): Tìm kiếm mọi vị trí đề cập trong quy chuẩn.
+- Tra cứu chuyên đề (`action: 'get_topic'`, `query: 'cau-thang-va-hanh-lang'`): Lấy trọn vẹn văn bản hướng dẫn.
 * **Ví dụ ra lệnh**:
-  > *"In hàng loạt toàn bộ hồ sơ thi công ra các file PDF A3"* hoặc *"In riêng bản vẽ mặt đứng KT-05 ra file PDF"*
+  > *"Tra cứu tiêu chuẩn thiết kế phòng tắm vệ sinh 3 khu"* hoặc *"Tìm quy chuẩn khoảng cách nan lan can an toàn trẻ em"*
 
 ---
 
@@ -146,7 +175,7 @@ Thêm vào file cấu hình MCP (`~/.gemini/antigravity-ide/mcp_config.json` ho�
 {
   "mcpServers": {
     "autocad-ai": {
-      "command": "C:\\Users\\YOUR_USERNAME\\.autocad_ai\\venv\\Scripts\\python.exe",
+      "command": "C:\\\\Users\\\\YOUR_USERNAME\\\\.autocad_ai\\\\venv\\\\Scripts\\\\python.exe",
       "args": ["-m", "autocad_ai.servers.win_server"]
     }
   }
