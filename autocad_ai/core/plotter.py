@@ -93,27 +93,51 @@ def build_batch_plot_commands(
     plot_style: str = "monochrome.ctb",
     base_width_mm: float = 5000.0,
     base_length_mm: float = 15000.0,
+    batch_scope: str = "full_project_set",
 ) -> Dict[str, Any]:
     """
-    Generate batch plotting commands for all 4 construction documentation sheets.
+    Generate batch plotting commands for architectural construction documentation sheets.
+    - batch_scope: 'all_floor_plans' (KT-01 to KT-04) or 'full_project_set' (KT-01 to KT-11).
     """
     out_dir = os.path.abspath(os.path.expanduser(output_directory or "~/Desktop/CAD_PDF_Exports"))
     os.makedirs(out_dir, exist_ok=True)
 
-    sheet_list = sheets or [
-        {"code": "KT-01", "title": "Tuong_Xay", "col_idx": 0},
-        {"code": "KT-02", "title": "Lat_San", "col_idx": 1},
-        {"code": "KT-03", "title": "Noi_That", "col_idx": 2},
-        {"code": "KT-04", "title": "Cua", "col_idx": 3},
-    ]
+    if sheets:
+        sheet_list = sheets
+    elif batch_scope == "all_floor_plans":
+        sheet_list = [
+            {"code": "KT-01", "title": "Tuong_Xay", "col_idx": 0, "row_idx": 0},
+            {"code": "KT-02", "title": "Lat_San", "col_idx": 1, "row_idx": 0},
+            {"code": "KT-03", "title": "Noi_That", "col_idx": 2, "row_idx": 0},
+            {"code": "KT-04", "title": "Cua", "col_idx": 3, "row_idx": 0},
+        ]
+    else:
+        # Full 11 construction sheets
+        sheet_list = [
+            # Row 1: Floor plans
+            {"code": "KT-01", "title": "Tuong_Xay", "col_idx": 0, "row_idx": 0},
+            {"code": "KT-02", "title": "Lat_San", "col_idx": 1, "row_idx": 0},
+            {"code": "KT-03", "title": "Noi_That", "col_idx": 2, "row_idx": 0},
+            {"code": "KT-04", "title": "Cua", "col_idx": 3, "row_idx": 0},
+            # Row 2: Elevations, Sections, Ceiling, Roof
+            {"code": "KT-05", "title": "Mat_Dung_Chinh", "col_idx": 0, "row_idx": 1},
+            {"code": "KT-06", "title": "Mat_Cat_Doc_1-1", "col_idx": 1, "row_idx": 1},
+            {"code": "KT-07", "title": "Tran_Den", "col_idx": 2, "row_idx": 1},
+            {"code": "KT-08", "title": "Mai_Thoat_Nuoc", "col_idx": 3, "row_idx": 1},
+            # Row 3: Details
+            {"code": "KT-09", "title": "Chi_Tiet_Thang", "col_idx": 0, "row_idx": 2},
+            {"code": "KT-10", "title": "Chi_Tiet_WC", "col_idx": 1, "row_idx": 2},
+            {"code": "KT-11", "title": "Chi_Tiet_Cua", "col_idx": 2, "row_idx": 2},
+        ]
 
     all_cmds = [
         ";; ==========================================================================",
-        f";; AutoCAD AI: BATCH PLOT {len(sheet_list)} SHEETS TO PDF",
+        f";; AutoCAD AI: BATCH PLOT {len(sheet_list)} SHEETS TO PDF ({batch_scope.upper()})",
         ";; ==========================================================================",
     ]
 
     spacing_x = base_width_mm + 12000.0
+    spacing_y = base_length_mm + 12000.0
     bw = 14000.0
     bh = 20000.0
     generated_files = []
@@ -121,11 +145,13 @@ def build_batch_plot_commands(
     for s in sheet_list:
         code = s.get("code", "KT-01")
         title = s.get("title", "Sheet")
-        idx = s.get("col_idx", 0)
+        c_idx = s.get("col_idx", 0)
+        r_idx = s.get("row_idx", 0)
 
-        ox = idx * spacing_x
-        p1 = [ox - 2000.0, -3000.0]
-        p2 = [ox - 2000.0 + bw, -3000.0 + bh]
+        ox = c_idx * spacing_x
+        oy = r_idx * spacing_y
+        p1 = [ox - 2000.0, oy - 3000.0]
+        p2 = [ox - 2000.0 + bw, oy - 3000.0 + bh]
 
         pdf_filename = f"{project_name}_{code}_{title}.pdf"
         pdf_path = os.path.join(out_dir, pdf_filename)

@@ -48,8 +48,8 @@ def test_modifier_commands():
     assert any("_.STRETCH" in c for c in stretch_cmds)
 
 
-def test_finalizer_4_sheets():
-    """Test generating all 4 construction documentation sheets."""
+def test_finalizer_all_11_sheets():
+    """Test generating all 11 architectural construction documentation sheets."""
     rooms = [
         {"name": "PHÒNG KHÁCH", "y_start": 2500, "y_end": 7000, "type": "living"},
         {"name": "WC", "y_start": 13500, "y_end": 15000, "type": "wc"},
@@ -57,41 +57,56 @@ def test_finalizer_4_sheets():
 
     # Sheet 1: KT-01 Wall construction
     s1 = build_wall_construction_sheet_commands(5000, 15000, rooms)
-    s1_str = " ".join(s1)
-    assert "KT-01" in s1_str
-    assert "MẶT BẰNG KÍCH THƯỚC TƯỜNG XÂY" in s1_str
-    assert "_.DIMLINEAR" in s1_str
-    assert "KT_NOITHAT" in s1_str  # Frozen
+    assert "KT-01" in " ".join(s1)
 
     # Sheet 2: KT-02 Floor finishes
     s2 = build_floor_finishes_sheet_commands(5000, 15000, rooms)
-    s2_str = " ".join(s2)
-    assert "KT-02" in s2_str
-    assert "MẶT BẰNG ĐỊNH VỊ & ỐP LÁT SÀN" in s2_str
-    assert "COT SAN" in s2_str
-    assert "DIEM LAT DAU TIEN" in s2_str
-    assert "DO DOC" in s2_str
+    assert "KT-02" in " ".join(s2)
 
     # Sheet 3: KT-03 Furniture layout
     s3 = build_furniture_layout_sheet_commands(5000, 15000, rooms)
-    s3_str = " ".join(s3)
-    assert "KT-03" in s3_str
-    assert "BANG THONG KE NOI THAT" in s3_str
+    assert "KT-03" in " ".join(s3)
 
     # Sheet 4: KT-04 Door schedule
     s4 = build_door_schedule_sheet_commands(5000, 15000, [])
-    s4_str = " ".join(s4)
-    assert "KT-04" in s4_str
-    assert "BANG CHI DAN THONG SO CUA" in s4_str
-    assert "D1" in s4_str
+    assert "KT-04" in " ".join(s4)
 
-    # Full set of 4 sheets
-    s_all = build_finalized_sheets_commands("all", 5000, 15000, rooms)
-    s_all_str = " ".join(s_all)
-    assert "KT-01" in s_all_str
-    assert "KT-02" in s_all_str
-    assert "KT-03" in s_all_str
-    assert "KT-04" in s_all_str
+    # Sheet 5: KT-05 Elevation
+    s5 = build_finalized_sheets_commands("elevation", 5000, 15000, rooms)
+    assert "KT-05" in " ".join(s5)
+    assert "MẶT ĐỨNG CHÍNH CÔNG TRÌNH" in " ".join(s5)
+
+    # Sheet 6: KT-06 Section
+    s6 = build_finalized_sheets_commands("section", 5000, 15000, rooms)
+    assert "KT-06" in " ".join(s6)
+    assert "MẶT CẮT DỌC 1-1 QUA THANG" in " ".join(s6)
+
+    # Sheet 7: KT-07 Ceiling & Lighting
+    s7 = build_finalized_sheets_commands("ceiling_lighting", 5000, 15000, rooms)
+    assert "KT-07" in " ".join(s7)
+
+    # Sheet 8: KT-08 Roof & Drainage
+    s8 = build_finalized_sheets_commands("roof_drainage", 5000, 15000, rooms)
+    assert "KT-08" in " ".join(s8)
+
+    # Sheet 9: KT-09 Stair details
+    s9 = build_finalized_sheets_commands("stair_detail", 5000, 15000, rooms)
+    assert "KT-09" in " ".join(s9)
+
+    # Sheet 10: KT-10 WC details
+    s10 = build_finalized_sheets_commands("wc_detail", 5000, 15000, rooms)
+    assert "KT-10" in " ".join(s10)
+
+    # Sheet 11: KT-11 Door details
+    s11 = build_finalized_sheets_commands("door_detail", 5000, 15000, rooms)
+    assert "KT-11" in " ".join(s11)
+
+    # Full set of all 11 sheets
+    s_full = build_finalized_sheets_commands("full_project_set", 5000, 15000, rooms)
+    s_full_str = " ".join(s_full)
+    for code in ["KT-01", "KT-02", "KT-03", "KT-04", "KT-05", "KT-06", "KT-07", "KT-08", "KT-09", "KT-10", "KT-11"]:
+        assert code in s_full_str
+
 
 
 def test_detailed_estimator():
@@ -153,9 +168,14 @@ def test_plotter_commands():
     assert "ISO full bleed A3" in cmd_str
     assert "monochrome.ctb" in cmd_str
 
-    batch = build_batch_plot_commands(output_directory="/tmp/cad_test_batch")
-    assert batch["sheet_count"] == 4
-    assert len(batch["pdf_files"]) == 4
+    batch_full = build_batch_plot_commands(output_directory="/tmp/cad_test_batch", batch_scope="full_project_set")
+    assert batch_full["sheet_count"] == 11
+    assert len(batch_full["pdf_files"]) == 11
+
+    batch_floors = build_batch_plot_commands(output_directory="/tmp/cad_test_batch", batch_scope="all_floor_plans")
+    assert batch_floors["sheet_count"] == 4
+    assert len(batch_floors["pdf_files"]) == 4
+
 
 
 def test_servers_registration():

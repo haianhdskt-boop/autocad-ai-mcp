@@ -23,6 +23,8 @@ Chạy lệnh sau trong PowerShell (chỉ cài module COM ActiveX Windows):
 irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win.ps1 | iex
 ```
 
+---
+
 ## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP)
 
 Hệ thống được thiết kế vận hành theo đúng phương pháp luận làm việc của Kiến Trúc Sư:
@@ -43,7 +45,7 @@ flowchart TD
 2. **Bước 2: Phân Tích & Đề Xuất Phương Án**: AI phân tích và mô tả chi tiết phương án phân chia không gian, giao thông, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
 3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_draw_new` vẽ trực tiếp lên màn hình AutoCAD.
 4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động kiểm tra kích thước thông thủy, tiêu chuẩn phòng (`cad_inspect`), phát hiện và tự sửa lỗi nếu có lệch.
-5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích $m^2$ chi tiết từng phòng cho KTS nghiệm thu.
+5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích m2 chi tiết từng phòng cho KTS nghiệm thu.
 
 ---
 
@@ -73,7 +75,7 @@ flowchart TD
             GIAI ĐOẠN THIẾT KẾ & SỬA ĐỔI            GIAI ĐOẠN HỒ SƠ, DỰ TOÁN & IN ẤN
             ┌────────────────────────────┐          ┌────────────────────────────┐
             │ 1. ✍️ cad_draw_new         │          │ 3. 📐 cad_finalize_drawing │
-            │ (Vẽ mới không gian/tường)  │          │ (Tách bộ 4 bản vẽ thi công)│
+            │ (Vẽ mới không gian/tường)  │          │ (Dàn trang 11 bản vẽ TKTC) │
             │                            │          │                            │
             │ 2. 🔧 cad_modify           │          │ 4. 📊 cad_estimate         │
             │ (Sửa, dịch tường, đổi cửa) │          │ (Bóc dự toán chi tiết Excel│
@@ -99,14 +101,27 @@ Hiệu chỉnh, di dời mảng tường, co giãn kích thước phòng (`STRET
 * **Ví dụ ra lệnh**:
   > *"Kéo rộng phòng khách lùi về phía sau thêm 500mm và đổi cánh cửa phòng ngủ mở vào trong tường."*
 
-### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Bộ 4 Bản Vẽ Thi Công (TKTC)
-Tự động phân tách mặt bằng gốc thành **Bộ 4 bản vẽ triển khai chuyên biệt** lồng sẵn khung tên chuẩn A3:
-- **`KT-01` (Kích thước tường xây)**: Tắt nội thất, DIM 3 lớp (chi tiết, tim trục, phủ bì), hatch tường gạch, ghi chú tường 220/110.
-- **`KT-02` (Định vị & Ốp lát sàn)**: Tắt nội thất, ghi chú cao độ phòng (`+0.450`), đánh dấu điểm mốc lát đầu tiên ($\otimes$), mũi tên dốc thoát sàn ($i=1.5\%$) WC/ban công.
-- **`KT-03` (Bố trí nội thất)**: Đầy đủ đồ nội thất, tag mã hiệu (`SF1`, `TV1`, `BA1`), tên phòng, diện tích thông thủy ($m^2$), bảng thống kê nội thất.
-- **`KT-04` (Định vị & Phân loại cửa)**: Lỗ mở cửa thô, tag cửa tròn `D1`, `D2`, `S1`, Bảng chỉ dẫn thông số (Rộng $\times$ Cao, Cốt bậu dưới Sill Height, Cốt lanh-tô Header Height, vật liệu).
+### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Trọn Bộ Hồ Sơ Thi Công (11 Bản Vẽ Chuẩn TKTC)
+Tự động hoàn thiện, phân tách và dàn trang trọn bộ **11 bản vẽ kỹ thuật thi công kiến trúc** lồng sẵn khung tên chuẩn A3 theo 5 nhóm chuyên biệt:
+
+* **Nhóm 1: Hệ thống Mặt Bằng Các Tầng**:
+  - **`KT-01` (Kích thước tường xây)**: Tắt nội thất, DIM 3 lớp (chi tiết, tim trục, phủ bì), hatch tường gạch, ghi chú tường 220/110.
+  - **`KT-02` (Định vị & Ốp lát sàn)**: Tắt nội thất, ghi chú cao độ phòng (`+0.450`), đánh dấu điểm mốc lát đầu tiên, mũi tên dốc thoát sàn ($i=1.5\%$) WC/ban công.
+  - **`KT-03` (Bố trí nội thất)**: Đầy đủ đồ nội thất, tag mã hiệu (`SF1`, `TV1`, `BA1`), tên phòng, diện tích thông thủy ($m^2$), bảng thống kê nội thất.
+  - **`KT-04` (Định vị & Phân loại cửa)**: Lỗ mở cửa thô, tag cửa tròn `D1`, `D2`, `S1`, Bảng chỉ dẫn thông số (Rộng x Cao, Cốt bậu dưới Sill Height, Cốt lanh-tô Header Height, vật liệu).
+* **Nhóm 2: Mặt Đứng & Mặt Cắt Công Trình**:
+  - **`KT-05` (Mặt đứng chính công trình)**: Toàn bộ mặt tiền kiến trúc, cao độ các tầng, ban công, mái, chỉ dẫn vật liệu (đá granite, lam nhôm, sơn ngoại thất).
+  - **`KT-06` (Mặt cắt dọc 1-1 qua thang)**: Cắt qua thang và giếng trời, thể hiện cấu tạo sàn, chiều cao thông thủy, lanh-tô.
+* **Nhóm 3: Mặt Bằng Trần Đèn & Thoát Nước Mái**:
+  - **`KT-07` (Mặt bằng Trần thạch cao & Đèn)**: Trần giật cấp, cao độ hạ trần, khe hắt LED, lưới đèn downlight D90 9W.
+  - **`KT-08` (Mặt bằng Mái & Thoát nước)**: Độ dốc thoát nước mái $i=2\%$ về sê-nô, lớp chống thấm, vị trí đặt bồn nước & thái dương năng.
+* **Nhóm 4: Hệ Thống Chi Tiết Kiến Trúc Chuyên Sâu**:
+  - **`KT-09` (Chi tiết Cầu Thang & Lan can)**: Chi tiết mặt bậc gỗ $h=171\text{mm}, b=260\text{mm}$, mũi bậc bo tròn R10, cổ bậc ốp đá trắng, lan can kính tay vịn gỗ.
+  - **`KT-10` (Chi tiết Phòng Vệ Sinh)**: Mặt bằng trích WC tỷ lệ 1/25 và mặt cắt triển khai 4 vách tường ốp lát gạch kèm cốt sen tắm, lavabo, bệt.
+  - **`KT-11` (Chi tiết Cấu Tạo Cửa)**: Chi tiết cửa đi chính D1 (4 cánh), cửa sổ trượt S1 (2 cánh) kèm quy cách đố cửa & phụ kiện.
+
 * **Ví dụ ra lệnh**:
-  > *"Xuất trọn bộ 4 bản vẽ thi công A3 cho mặt bằng tầng 1."* (hoặc xuất riêng từng bản vẽ).
+  > *"Xuất trọn bộ 11 bản vẽ thi công kiến trúc A3 cho công trình"* (hoặc *"Xuất riêng mặt đứng chính và mặt cắt 1-1 qua thang"*).
 
 ### 4️⃣ `cad_estimate` — Bóc Tách Dự Toán Thi Công Chi Tiết (BOQ)
 Tính toán khối lượng toàn diện theo định mức xây dựng Việt Nam và xuất file **Excel / CSV**:
@@ -129,45 +144,38 @@ Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.R
 
 ### 7️⃣ `cad_plot` — In & Xuất Hồ Sơ PDF Chuẩn Nét Kỹ Thuật
 In trực tiếp từ AutoCAD ra file **PDF A3/A2** với phân cấp độ dày nét chuẩn (`monochrome.ctb` in đen trắng, tường/cột $0.40\text{mm}$, nét thấy $0.20\text{mm}$, dim/trục $0.13\text{mm}$, hatch $0.09\text{mm}$):
-- **In hàng loạt (`batch_all`)**: In tự động toàn bộ 4 bản vẽ `KT-01` $\rightarrow$ `KT-04` ra các file PDF chuẩn A3 trong thư mục chỉ định.
-- **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01`).
+- **In hàng loạt (`batch_all`)**: In tự động toàn bộ 11 bản vẽ `KT-01` -> `KT-11` (hoặc bộ 4 mặt bằng `KT-01` -> `KT-04`) ra các file PDF chuẩn A3 trong thư mục chỉ định.
+- **In bản vẽ đơn (`single_sheet`)**: In riêng 1 bản vẽ theo mã hiệu (ví dụ `KT-01`, `KT-05`, `KT-09`).
 * **Ví dụ ra lệnh**:
-  > *"In hàng loạt toàn bộ 4 bản vẽ KT-01 đến KT-04 ra các file PDF A3"* hoặc *"In riêng bản vẽ tường xây KT-01 ra file PDF"*
+  > *"In hàng loạt trọn bộ 11 bản vẽ thi công ra các file PDF A3"* hoặc *"In riêng bản vẽ mặt đứng KT-05 ra file PDF"*
 
 ---
 
 ## 🔌 CẤU HÌNH VÀO AI CLIENT
 
-### 1. Antigravity IDE / Cursor (`mcp_config.json`):
-```json
-{
-  "mcpServers": {
-    "autocad-ai": {
-      "command": "/path/to/autocad-mcp/.venv/bin/python",
-      "args": ["-m", "autocad_ai.servers.mac_server"]
-    }
-  }
-}
-```
-*(Trên Windows thay `mac_server` bằng `win_server` và đường dẫn Python tương ứng)*
+### Antigravity / Claude Desktop / Cursor / VS Code:
+Thêm vào file cấu hình MCP (`~/.gemini/antigravity-ide/mcp_config.json` hoặc `claude_desktop_config.json`):
 
-### 2. Claude Desktop (`claude_desktop_config.json`):
+#### Trên macOS:
 ```json
 {
   "mcpServers": {
     "autocad-ai": {
-      "command": "/path/to/autocad-mcp/.venv/bin/python",
+      "command": "/Users/YOUR_USERNAME/.autocad_ai/venv/bin/python",
       "args": ["-m", "autocad_ai.servers.mac_server"]
     }
   }
 }
 ```
 
----
-
-## 🧪 KIỂM THỬ (TEST SUITE)
-
-```bash
-source .venv/bin/activate
-pytest -v
+#### Trên Windows:
+```json
+{
+  "mcpServers": {
+    "autocad-ai": {
+      "command": "C:\\Users\\YOUR_USERNAME\\.autocad_ai\\venv\\Scripts\\python.exe",
+      "args": ["-m", "autocad_ai.servers.win_server"]
+    }
+  }
+}
 ```

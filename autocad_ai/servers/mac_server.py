@@ -86,7 +86,7 @@ def cad_modify(
 
 @mcp.tool()
 def cad_finalize_drawing(
-    sheet_type: str = "all",
+    sheet_type: str = "full_project_set",
     frontage_width_mm: float = 5000.0,
     depth_length_mm: float = 15000.0,
     rooms: Optional[List[Dict[str, Any]]] = None,
@@ -95,14 +95,22 @@ def cad_finalize_drawing(
     origin_y: float = 0.0,
 ) -> Dict[str, Any]:
     """
-    3. HOÀN THIỆN BỘ HỒ SƠ THI CÔNG (cad_finalize_drawing):
-    Tự động phân tách và dàn trang bộ 4 bản vẽ thi công chuyên biệt kèm khung tên chuẩn A3:
+    3. HOÀN THIỆN BỘ HỒ SƠ THI CÔNG KIẾN TRÚC (cad_finalize_drawing):
+    Tự động hoàn thiện và dàn trang trọn bộ 11 bản vẽ kỹ thuật thi công chuẩn A3:
     - sheet_type:
-        * 'all': Xuất trọn bộ 4 bản vẽ dàn trang cạnh nhau sẵn sàng in ấn/plot!
-        * 'wall_construction': Bản vẽ KT-01 Kích thước tường xây (DIM 3 lớp, hatch tường gạch, không nội thất)
-        * 'floor_finishes': Bản vẽ KT-02 Định vị ốp lát sàn, cao độ phòng, mốc lát đầu tiên, mũi tên độ dốc WC
-        * 'furniture_layout': Bản vẽ KT-03 Bố trí nội thất, tag mã hiệu đồ, diện tích phòng & bảng thống kê
-        * 'door_window_schedule': Bản vẽ KT-04 Định vị cửa, tag D1/S1, bảng kích thước, cốt bậu dưới & lanh-tô
+        * 'full_project_set' / 'all': Dàn trang trọn bộ toàn bộ 11 bản vẽ thi công (KT-01 đến KT-11)
+        * 'all_floor_plans': Dàn trang bộ 4 mặt bằng tầng (KT-01 đến KT-04)
+        * 'wall_construction': KT-01 Kích thước tường xây (DIM 3 lớp, hatch tường gạch, không nội thất)
+        * 'floor_finishes': KT-02 Định vị & ốp lát sàn (cao độ phòng, mốc lát đầu tiên, mũi tên độ dốc WC)
+        * 'furniture_layout': KT-03 Bố trí nội thất, tag mã hiệu đồ, diện tích phòng & bảng thống kê
+        * 'door_window_schedule': KT-04 Định vị cửa, tag D1/S1, bảng kích thước & cốt bậu dưới/lanh-tô
+        * 'elevation': KT-05 Mặt đứng chính công trình (cốt cao độ các tầng, chỉ dẫn vật liệu ngoại thất)
+        * 'section': KT-06 Mặt cắt dọc 1-1 qua thang & giếng trời (cấu tạo sàn, chiều cao thông thủy)
+        * 'ceiling_lighting': KT-07 Mặt bằng trần thạch cao giật cấp & bố trí đèn downlight LED
+        * 'roof_drainage': KT-08 Mặt bằng mái, độ dốc thu nước sê-nô & vị trí bồn nước
+        * 'stair_detail': KT-09 Chi tiết bậc thang, mặt bậc gỗ, lan can kính & tay vịn
+        * 'wc_detail': KT-10 Chi tiết phòng vệ sinh trích 1/25 & triển khai 4 vách ốp lát
+        * 'door_detail': KT-11 Chi tiết cấu tạo cửa đi D1, D2 và cửa sổ S1
     """
     room_list = rooms or [
         {"name": "SÂN TRƯỚC", "y_start": 0, "y_end": 2500, "type": "yard"},
