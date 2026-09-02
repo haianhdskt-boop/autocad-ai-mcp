@@ -260,16 +260,16 @@ def test_knowledge_engine():
 
 
 def test_servers_registration():
-    """Test that all 8 core business commands are registered on Mac and Win servers."""
-    expected_tools = {
-        "cad_draw_new",
-        "cad_modify",
-        "cad_finalize_drawing",
-        "cad_estimate",
-        "cad_inspect",
-        "cad_command",
-        "cad_plot",
-        "cad_reference_guide",
+    """Test that all 8 core Vietnamese business commands are registered on Mac and Win servers."""
+    expected_vietnamese_tools = {
+        "cad_ve_moi",
+        "cad_chinh_sua",
+        "cad_hoan_thien_ho_so",
+        "cad_du_toan",
+        "cad_kiem_tra",
+        "cad_gui_lenh",
+        "cad_in_pdf",
+        "cad_tra_cuu_quy_chuan",
     }
 
     from autocad_ai.servers.mac_server import mcp as mac_mcp
@@ -279,6 +279,8 @@ def test_servers_registration():
     mac_tools = {t.name for t in asyncio.run(mac_mcp.list_tools())}
     win_tools = {t.name for t in asyncio.run(win_mcp.list_tools())}
 
-    assert expected_tools.issubset(mac_tools)
-    assert expected_tools.issubset(win_tools)
+    assert expected_vietnamese_tools.issubset(mac_tools)
+    assert expected_vietnamese_tools.issubset(win_tools)
+
+
 
