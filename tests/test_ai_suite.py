@@ -120,13 +120,16 @@ def test_dynamic_stairs_and_pagination():
     """Test dynamic stair calculation and dynamic door pagination."""
     from autocad_ai.core.finalizer import calculate_stair_parameters, build_door_details_paginated_commands
 
-    # Dynamic stair check
+    # Dynamic stair check (h = H/N, b_raw = 250mm, b_finish = 270mm)
     stair_3600 = calculate_stair_parameters(floor_height_mm=3600.0, num_risers=21)
     assert stair_3600["riser_height_mm"] == 171.4
-    assert 240 <= stair_3600["tread_width_mm"] <= 300
+    assert stair_3600["tread_width_raw_mm"] == 250.0
+    assert stair_3600["tread_width_finish_mm"] == 270.0
 
     stair_3900 = calculate_stair_parameters(floor_height_mm=3900.0, num_risers=23)
     assert stair_3900["riser_height_mm"] == 169.6
+    assert stair_3900["tread_width_raw_mm"] == 250.0
+
 
     # Dynamic door pagination (10 doors -> 4 A3 sheets)
     doors_10 = [{"code": f"D{i}", "name": f"Door {i}", "width": 900, "height": 2200} for i in range(1, 11)]

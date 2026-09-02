@@ -82,19 +82,19 @@ Hiệu chỉnh, di dời mảng tường, co giãn kích thước phòng (`STRET
 * **Ví dụ ra lệnh**:
   > *"Kéo rộng phòng khách lùi về phía sau thêm 500mm và đổi cánh cửa phòng ngủ mở vào trong tường."*
 
-### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Hồ Sơ Thi Công (Phân Trang Động & Tính Toán Công Thái Học)
+### 3️⃣ `cad_finalize_drawing` — Hoàn Thiện Hồ Sơ Thi Công (Phân Trang Động & Chuẩn Thi Công)
 Hệ thống **TỰ ĐỘNG PHÂN TRANG THEO KHỐI LƯỢNG THỰC TẾ** (không khống chế cứng số lượng trang A3 để đảm bảo bản vẽ in ra luôn rõ nét ở tỷ lệ kỹ thuật):
 
-* **Tính toán động Cầu thang (`KT-09`)**:
+* **Kích thước Cầu thang chuẩn thi công (`KT-09`)**:
   - Chiều cao cổ bậc tính động: $h = \frac{H_{\text{tầng}}}{N_{\text{cổ bậc}}}$ (Ví dụ: Tầng cao 3.6m có 21 bậc $\rightarrow h = 171.4\text{mm}$; Tầng 3.9m có 23 bậc $\rightarrow h = 169.5\text{mm}$; Tầng 4.2m có 25 bậc $\rightarrow h = 168.0\text{mm}$).
-  - Bề rộng mặt bậc $b$ tính theo quy tắc công thái học Blondel $2h + b \approx 600..640\text{mm}$.
+  - Bề rộng mặt bậc xây thô chuẩn cố định: $b = 250\text{mm}$ (mặt bậc hoàn thiện ốp gỗ/đá là $270\text{mm}$ với mũi bậc chìa $20\text{mm}$ bo tròn R10).
 * **Phân trang động Chi tiết cửa (`KT-11.01`, `KT-11.02`...)**:
-  - Mỗi tờ A3 chỉ chứa tối đa 3-4 bộ cửa để đảm bảo tỷ lệ $1/25$ đọc rõ nét. Nếu công trình có 12 loại cửa, hệ thống sẽ tự động tách thành 4 tờ A3 riêng biệt.
+  - Mỗi tờ A3 chỉ chứa tối đa 3-4 bộ cửa để đảm bảo tỷ lệ $1/25$ đọc rõ nét. Nếu công trình có 12 loại cửa, hệ thống tự động tách thành 4 tờ A3 riêng biệt.
 * **Hệ thống các nhóm bản vẽ thi công**:
   - **Nhóm Mặt bằng**: `KT-01` (Tường xây), `KT-02` (Ốp lát sàn & mốc lát, độ dốc), `KT-03` (Bố trí nội thất & bảng thống kê), `KT-04` (Định vị cửa & bảng bậu/lanh-tô).
   - **Nhóm Mặt đứng & Mặt cắt**: `KT-05` (Mặt đứng chính công trình kèm vật liệu), `KT-06` (Mặt cắt dọc 1-1 qua thang).
   - **Nhóm Trần & Mái**: `KT-07` (Trần thạch cao giật cấp & đèn LED), `KT-08` (Mặt bằng mái & thoát nước sê-nô).
-  - **Nhóm Chi tiết chuyên sâu**: `KT-09` (Chi tiết thang tính động $h, b$), `KT-10` (Chi tiết WC trích 1/25 & 4 vách), `KT-11` (Chi tiết cửa phân trang động).
+  - **Nhóm Chi tiết chuyên sâu**: `KT-09` (Chi tiết thang $h=H/N$, $b=250/270\text{mm}$), `KT-10` (Chi tiết WC trích 1/25 & 4 vách), `KT-11` (Chi tiết cửa phân trang động).
 
 ### 4️⃣ `cad_estimate` — Bóc Tách Dự Toán Thi Công Chi Tiết (BOQ)
 Tính toán khối lượng toàn diện theo định mức xây dựng Việt Nam và xuất file **Excel / CSV**:

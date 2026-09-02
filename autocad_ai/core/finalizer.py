@@ -14,26 +14,31 @@ from typing import Dict, Any, List, Optional
 def calculate_stair_parameters(
     floor_height_mm: float = 3600.0,
     num_risers: int = 21,
-    target_blondel: float = 620.0,
+    tread_width_raw_mm: float = 250.0,
+    nosing_mm: float = 20.0,
 ) -> Dict[str, Any]:
     """
-    Dynamically calculate stair ergonomic parameters based on floor height and riser count.
-    - h (Cổ bậc) = floor_height / num_risers
-    - b (Mặt bậc) = target_blondel - 2*h (Blondel ergonomic rule: 2h + b = 600..640mm)
+    Kích thước hình học cầu thang chuẩn thi công dân dụng:
+    - Chiều cao cổ bậc h = Floor_Height / Num_Risers (tính động theo tầng & số bậc)
+    - Chiều rộng mặt bậc xây thô b = 250mm (chuẩn cố định cho nhà dân dụng)
+    - Chiều rộng mặt bậc hoàn thiện = 270mm (kèm mũi bậc chìa 20mm bo tròn R10)
     """
     n = max(num_risers, 3)
     h = floor_height_mm / float(n)
-    b = max(240.0, min(300.0, target_blondel - 2.0 * h))
-    slope_deg = math.degrees(math.atan(h / b))
+    b_raw = tread_width_raw_mm  # 250.0mm chuẩn xây thô
+    b_finish = b_raw + nosing_mm  # 270.0mm hoàn thiện mũi bậc
+    slope_deg = math.degrees(math.atan(h / b_raw))
 
     return {
         "floor_height_mm": floor_height_mm,
         "num_risers": n,
         "riser_height_mm": round(h, 1),
-        "tread_width_mm": round(b, 1),
+        "tread_width_raw_mm": b_raw,
+        "tread_width_finish_mm": b_finish,
+        "nosing_mm": nosing_mm,
         "slope_degrees": round(slope_deg, 1),
-        "blondel_value": round(2.0 * h + b, 1),
     }
+
 
 
 def build_title_block_commands(
@@ -264,12 +269,14 @@ def build_stair_detail_sheet_commands(
     project_name: str = "Nhà Phố Dân Dụng",
 ) -> List[str]:
     """
-    Chi tiết cầu thang & lan can với chiều cao cổ bậc (h) và bề rộng mặt bậc (b)
-    được TÍNH TOÁN ĐỘNG theo chiều cao tầng và số cổ bậc thực tế.
+    Chi tiết cầu thang & lan can:
+    - Chiều cao cổ bậc h = H / N tính động theo tầng.
+    - Bề rộng mặt bậc chuẩn thi công: b_thô = 250mm, b_hoàn_thiện = 270mm (mũi bậc chìa 20mm bo tròn R10).
     """
     stair_info = calculate_stair_parameters(floor_height_mm, num_risers)
     h = stair_info["riser_height_mm"]
-    b = stair_info["tread_width_mm"]
+    b_raw = stair_info["tread_width_raw_mm"]
+    b_fin = stair_info["tread_width_finish_mm"]
     n = stair_info["num_risers"]
     deg = stair_info["slope_degrees"]
 
@@ -277,23 +284,23 @@ def build_stair_detail_sheet_commands(
 
     cmds = [
         ";; ==========================================================================",
-        f";; SHEET {sheet_code}: CHI TIET CAU THANG (H={floor_height_mm}mm, N={n} BOC, h={h}mm, b={b}mm)",
+        f";; SHEET {sheet_code}: CHI TIET CAU THANG (H={floor_height_mm}mm, N={n} BOC, h={h}mm, b={int(b_raw)}/{int(b_fin)}mm)",
         ";; ==========================================================================",
         "_.-LAYER _M KT_CHI_TIET _C 7 KT_CHI_TIET  ",
         "_.-LAYER _M KT_DIMS_DETAIL _C 1 KT_DIMS_DETAIL  ",
         "_.-LAYER _S KT_CHI_TIET  ",
         # Draw dynamic step profile (3 sample steps at scale)
-        f"_.LINE {ox + 500},{oy + 2000} {ox + 500 + b*3},{oy + 2000} ",
-        f"_.LINE {ox + 500 + b*3},{oy + 2000} {ox + 500 + b*3},{oy + 2000 + h*3} ",
-        f"_.LINE {ox + 500 + b*3},{oy + 2000 + h*3} {ox + 500 + b*6},{oy + 2000 + h*3} ",
-        f"_.LINE {ox + 500 + b*6},{oy + 2000 + h*3} {ox + 500 + b*6},{oy + 2000 + h*6} ",
+        f"_.LINE {ox + 500},{oy + 2000} {ox + 500 + b_raw*3},{oy + 2000} ",
+        f"_.LINE {ox + 500 + b_raw*3},{oy + 2000} {ox + 500 + b_raw*3},{oy + 2000 + h*3} ",
+        f"_.LINE {ox + 500 + b_raw*3},{oy + 2000 + h*3} {ox + 500 + b_raw*6},{oy + 2000 + h*3} ",
+        f"_.LINE {ox + 500 + b_raw*6},{oy + 2000 + h*3} {ox + 500 + b_raw*6},{oy + 2000 + h*6} ",
         # Information Text Block
         f"_.-TEXT {ox + 500},{oy + 4200} 240 0 THONG SO HINH HOC THANG TANG (TY LE 1/20)",
         f"_.-TEXT {ox + 500},{oy + 3800} 180 0 * CHIEU CAO TANG: H = {int(floor_height_mm)} mm",
         f"_.-TEXT {ox + 500},{oy + 3400} 180 0 * SO CO BAC PHONG THUY: N = {n} BAC (CUNG SINH)",
         f"_.-TEXT {ox + 500},{oy + 3000} 180 0 * CHIEU CAO CO BAC: h = H/{n} = {h} mm",
-        f"_.-TEXT {ox + 500},{oy + 2600} 180 0 * BE RONG MAT BAC: b = {b} mm (GOC DOC {deg} DO)",
-        f"_.-TEXT {ox + 500},{oy + 2200} 160 0 * MAT BAC GO GO DO DAY 30mm, MUI BAC BO TRON R10",
+        f"_.-TEXT {ox + 500},{oy + 2600} 180 0 * BE RONG MAT BAC THO: b = {int(b_raw)} mm | HOAN THIEN: {int(b_fin)} mm (GOC DOC {deg} DO)",
+        f"_.-TEXT {ox + 500},{oy + 2200} 160 0 * MAT BAC GO GO DO/DA HOAN THIEN 270mm (MUI BAC CHIA 20mm BO TRON R10)",
         f"_.-TEXT {ox + 500},{oy + 1800} 160 0 * CO BAC OP DA TRANG SU NHAN TAO DAY 18mm",
         # Handrail detail
         f"_.RECTANG {ox + 4500},{oy + 1500} {ox + 7500},{oy + 4500}",
@@ -304,6 +311,7 @@ def build_stair_detail_sheet_commands(
 
     cmds.extend(build_title_block_commands(ox, oy, "CHI TIẾT CẦU THANG & LAN CAN", sheet_code, project_name, scale_str="1/20"))
     return cmds
+
 
 
 # ============================================================================
