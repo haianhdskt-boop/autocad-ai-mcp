@@ -178,10 +178,23 @@ def test_inspector_compliance():
     assert res_pass["is_standard_compliant"] is True
     assert res_pass["actual_area_m2"] == 20.0
 
-    # Non-compliant tiny room
-    res_fail = check_room_clear_dimensions(length_mm=2000, width_mm=2000, room_type="living")
+    # Non-compliant small bedroom (< 9m2)
+    res_fail = check_room_clear_dimensions(length_mm=2500, width_mm=2500, room_type="bedroom_single")
     assert res_fail["is_standard_compliant"] is False
     assert len(res_fail["warnings"]) > 0
+
+    # Full plan audit
+    from autocad_ai.core.inspector import audit_full_floor_plan
+    sample_rooms = [
+        {"name": "Phòng Khách", "y_start": 0, "y_end": 5000, "type": "living"},
+        {"name": "Cầu Thang", "y_start": 5000, "y_end": 7500, "type": "stairs"},
+        {"name": "Bếp & Ăn", "y_start": 7500, "y_end": 12000, "type": "kitchen"},
+        {"name": "WC", "y_start": 12000, "y_end": 14000, "type": "wc"},
+    ]
+    audit_res = audit_full_floor_plan(width_mm=5000, length_mm=14000, rooms=sample_rooms, floor_height_mm=3600, num_risers=21)
+    assert audit_res["is_compliant"] is True
+    assert len(audit_res["passed_rules"]) >= 3
+
 
 
 def test_plotter_commands():

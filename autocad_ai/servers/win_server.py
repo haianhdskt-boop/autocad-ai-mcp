@@ -7,26 +7,35 @@ from autocad_ai.core.drawer import build_new_floor_plan_commands
 from autocad_ai.core.modifier import build_modify_commands
 from autocad_ai.core.finalizer import build_finalized_sheets_commands
 from autocad_ai.core.estimator import calculate_detailed_construction_boq
-from autocad_ai.core.inspector import check_room_clear_dimensions, build_inspection_commands
+from autocad_ai.core.inspector import check_room_clear_dimensions, audit_full_floor_plan, build_inspection_commands
 from autocad_ai.core.plotter import build_plot_single_sheet_commands, build_batch_plot_commands
 from autocad_ai.drivers.win_driver import dispatch_to_autocad_win, is_windows
 
 SERVER_INSTRUCTIONS = """AutoCAD AI Professional Architect Suite (Windows COM).
 
-TUÂN THỦ NGHIÊM NGẶT 2 QUY TRÌNH CHUẨN CỦA KIẾN TRÚC SƯ:
+TUÂN THỦ BỘ QUY CHUẨN KIẾN TRÚC TRƯỚC KHI VẼ (architecture-reference-library):
+- Hành lang & Lối đi: Hành lang chính >= 1100mm, phụ >= 900mm.
+- Cầu thang: Vế thang >= 900mm, chiếu nghỉ >= 900mm, h = H/N (150-175mm), b = 250mm (hoàn thiện 270mm).
+- Lan can an toàn: Cao 900mm (thang), 1100mm (thông tầng), nan đứng hở <= 100mm (Quy tắc quả cầu 100mm bảo vệ trẻ em).
+- Phòng Khách: Diện tích >= 16m2, bề rộng >= 3.6m, cự ly TV >= 2.5m.
+- Bếp & Ăn: Diện tích >= 12m2, lối đi bếp >= 1000-1200mm, tam giác công năng chu vi 4.0-7.5m.
+- Phòng Ngủ: Master >= 14m2 (rộng >= 3.3m), phòng đơn/con >= 9m2 (rộng >= 2.7m).
+- Vệ Sinh: WC 3 khu >= 3.2m2 (rộng >= 1.4m), hạ cốt 30-50mm, độ dốc thoát nước i=1.5%.
+- Giếng Trời: Nhà sâu >= 12m bắt buộc có giếng trời/thông tầng >= 5% diện tích sàn tạo hiệu ứng Stack Effect.
 
+TUÂN THỦ 2 QUY TRÌNH CHUẨN CỦA KIẾN TRÚC SƯ:
 🏛️ QUY TRÌNH 1: THIẾT KẾ MỚI (5 BƯỚC)
-1. Bước 1 (Nạp nhiệm vụ): Tiếp nhận diện tích, công năng, sở thích, hình ảnh tham khảo từ KTS.
-2. Bước 2 (Đề xuất & Bàn bạc): Phân tích và đưa ra mô tả chi tiết phương án bố trí không gian, giao thông, cầu thang. DỪNG LẠI CHỜ KTS CHỐT PHƯƠNG ÁN trước khi vẽ.
-3. Bước 3 (Triển khai vẽ): Gọi 'cad_draw_new' vẽ trực tiếp lên AutoCAD theo đúng phương án đã chốt.
-4. Bước 4 (Tự kiểm tra): Tự động chạy 'cad_inspect' kiểm tra thông thủy, đối chiếu ý đồ chốt, tự sửa nếu có lệch.
-5. Bước 5 (Báo cáo hoàn thành): Báo cáo tóm tắt diện tích m2 và thông số hoàn thiện cho KTS.
+1. Bước 1: Tiếp nhận diện tích, công năng, sở thích, ảnh mẫu.
+2. Bước 2: Đối chiếu quy chuẩn & Đề xuất phương án. DỪNG LẠI CHỜ KTS CHỐT PHƯƠNG ÁN trước khi vẽ.
+3. Bước 3: Gọi 'cad_draw_new' vẽ trực tiếp lên AutoCAD theo phương án đã chốt.
+4. Bước 4: Gọi 'cad_inspect' (action='audit_full_plan') tự kiểm tra toàn diện thông thủy & tự sửa nếu có lệch.
+5. Bước 5: Báo cáo hoàn thành bảng diện tích m2 và thông số cho KTS.
 
 🔧 QUY TRÌNH 2: CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
-1. Bước 1 (Tiếp nhận yêu cầu): Lắng nghe phản hồi và chỉ dẫn chỉnh sửa từ KTS.
-2. Bước 2 (Thực hiện sửa): Gọi 'cad_modify' để Stretch, Move, Mirror, Rotate trực tiếp trên AutoCAD.
-3. Bước 3 (Tự kiểm tra lại): Kiểm tra không gian ảnh hưởng, đảm bảo không xung đột phòng lân cận.
-4. Bước 4 (Báo cáo hoàn thành): Zoom đến vị trí sửa và thông báo kích thước mới cho KTS.
+1. Bước 1: Tiếp nhận yêu cầu chỉnh sửa từ KTS.
+2. Bước 2: Gọi 'cad_modify' để Stretch, Move, Mirror, Rotate trực tiếp trên AutoCAD.
+3. Bước 3: Rà soát không gian ảnh hưởng, đảm bảo không làm phòng lân cận bị hẹp dưới ngưỡng tiêu chuẩn.
+4. Bước 4: Zoom đến vị trí sửa và thông báo kích thước mới cho KTS.
 """
 
 mcp = FastMCP(
@@ -170,17 +179,37 @@ def cad_estimate(
 
 @mcp.tool()
 def cad_inspect(
-    length_mm: float,
-    width_mm: float,
+    length_mm: Optional[float] = None,
+    width_mm: Optional[float] = None,
     room_type: str = "living",
     action: str = "check_standard",
+    rooms: Optional[List[Dict[str, Any]]] = None,
+    frontage_width_mm: float = 5000.0,
+    depth_length_mm: float = 15000.0,
+    floor_height_mm: float = 3600.0,
+    num_risers: int = 21,
 ) -> Dict[str, Any]:
     """
-    5. KIỂM TRA & ĐO ĐẠC (cad_inspect):
-    Kiểm tra diện tích thông thủy ($m^2$), kích thước lọt lòng theo tiêu chuẩn kiến trúc & công thái học.
-    - room_type: 'living', 'bedroom_master', 'bedroom_single', 'kitchen', 'wc', 'corridor', 'staircase'
+    5. KIỂM TRA & RÀ SOÁT QUY CHUẨN KIẾN TRÚC (cad_inspect):
+    Rà soát toàn diện phương án theo bộ tiêu chuẩn Neufert & Quy chuẩn Xây Dựng VN (architecture-reference-library).
+    - action:
+        * 'check_standard': Kiểm tra kích thước thông thủy 1 phòng (diện tích, chiều hẹp).
+        * 'audit_full_plan': Rà soát toàn bộ mặt bằng (hành lang, giếng trời, tam giác bếp, cầu thang, an toàn trẻ em).
+        * 'audit_purge': Thực hiện lệnh AUDIT và PURGE dọn sạch rác bản vẽ trên AutoCAD.
     """
-    res = check_room_clear_dimensions(length_mm, width_mm, room_type)
+    if action == "audit_full_plan" and rooms:
+        res = audit_full_floor_plan(
+            width_mm=frontage_width_mm,
+            length_mm=depth_length_mm,
+            rooms=rooms,
+            floor_height_mm=floor_height_mm,
+            num_risers=num_risers,
+        )
+    else:
+        l = length_mm or depth_length_mm
+        w = width_mm or frontage_width_mm
+        res = check_room_clear_dimensions(l, w, room_type)
+
     if action == "audit_purge":
         cmds = build_inspection_commands("audit_purge")
         dispatch_to_autocad_win(cmds)
