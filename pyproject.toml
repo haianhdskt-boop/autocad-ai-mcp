@@ -25,4 +25,10 @@ autocad-mcp = "autocad_mcp.server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["autocad_mcp*"]
+include = ["autocad_mcp*", "autocad_ai*"]
+
+[tool.setuptools.package-data]
+"autocad_ai.knowledge.library" = ["**/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

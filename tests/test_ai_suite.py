@@ -283,4 +283,33 @@ def test_servers_registration():
     assert expected_vietnamese_tools.issubset(win_tools)
 
 
+def test_integration_cad_ve_moi():
+    """Integration test: call cad_ve_moi through MCP tool layer to catch TypeError."""
+    from autocad_ai.servers.mac_server import cad_ve_moi
+    rooms = [
+        {"name": "Phòng Khách", "y_start": 2500, "y_end": 7000, "type": "living"},
+        {"name": "Cầu Thang", "y_start": 7000, "y_end": 9500, "type": "stairs"},
+    ]
+    # This call goes through the exact same path as MCP tool invocation
+    result = cad_ve_moi(
+        frontage_width_mm=5000.0,
+        depth_length_mm=15000.0,
+        rooms=rooms,
+    )
+    assert result is not None
+    assert "status" in result or "command_count" in result or "script_file" in result
 
+
+def test_integration_cad_chinh_sua():
+    """Integration test: call cad_chinh_sua through MCP tool layer to catch TypeError."""
+    from autocad_ai.servers.mac_server import cad_chinh_sua
+    result = cad_chinh_sua(
+        action="stretch_room",
+        target="wall",
+        dx=500.0,
+        dy=0.0,
+        window_p1=[1000, 2000],
+        window_p2=[4000, 5000],
+    )
+    assert result is not None
+    assert "status" in result or "command_count" in result or "script_file" in result

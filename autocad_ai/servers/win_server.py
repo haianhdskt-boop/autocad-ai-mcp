@@ -78,8 +78,8 @@ def cad_ve_moi(
     - KT_NOITHAT (Sofa, bàn ăn, bếp, bệt, lavabo)
     """
     cmds = build_new_floor_plan_commands(
-        frontage_width_mm=frontage_width_mm,
-        depth_length_mm=depth_length_mm,
+        width_mm=frontage_width_mm,
+        length_mm=depth_length_mm,
         rooms=rooms,
         wall_ext_mm=wall_ext_mm,
         wall_int_mm=wall_int_mm,
@@ -117,15 +117,42 @@ def cad_chinh_sua(
         * 'change_layer': Đổi layer đối tượng sang new_layer
         * 'delete_object': Xóa đối tượng trong vùng chọn
     """
+    # Map action names from server conventions → modifier conventions
+    ACTION_MAP = {
+        "stretch_room": "stretch",
+        "move_wall": "move",
+        "mirror_door": "mirror",
+        "rotate_object": "mirror",
+        "change_layer": "change_layer",
+        "delete_object": "delete",
+        "move": "move",
+        "stretch": "stretch",
+        "resize_room": "resize_room",
+        "change_door_swing": "change_door_swing",
+        "flip_door": "flip_door",
+        "mirror": "mirror",
+        "delete": "delete",
+        "erase": "erase",
+    }
+    mapped_action = ACTION_MAP.get(action.lower().strip(), action)
+
+    parameters = {
+        "dx": dx,
+        "dy": dy,
+        "base_point": window_p1 or [0, 0],
+        "crossing_corner1": window_p1 or [0, 0],
+        "crossing_corner2": window_p2 or [1000, 1000],
+        "axis_p1": window_p1 or [0, 0],
+        "axis_p2": window_p2 or [0, 1000],
+        "layer": new_layer or "0",
+        "rotation_deg": rotation_deg,
+        "delete_original": True,
+    }
+
     cmds = build_modify_commands(
-        action=action,
-        target=target,
-        dx=dx,
-        dy=dy,
-        window_p1=window_p1,
-        window_p2=window_p2,
-        new_layer=new_layer,
-        rotation_deg=rotation_deg,
+        action=mapped_action,
+        target_description=target,
+        parameters=parameters,
     )
     return dispatch_to_autocad_win(cmds)
 

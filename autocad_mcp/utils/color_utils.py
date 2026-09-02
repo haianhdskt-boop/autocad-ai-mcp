@@ -61,7 +61,11 @@ def rgb_to_aci(r: int, g: int, b: int) -> int:
         if aci == 0:
             continue
         rgb = ezdxf.colors.int2rgb(raw_int)
-        dist = math.dist((r, g, b), (rgb.r, rgb.g, rgb.b))
+        # int2rgb returns a plain tuple (r, g, b), not a named tuple
+        cr, cg, cb = (rgb[0] if isinstance(rgb, (tuple, list)) else rgb.r,
+                       rgb[1] if isinstance(rgb, (tuple, list)) else rgb.g,
+                       rgb[2] if isinstance(rgb, (tuple, list)) else rgb.b)
+        dist = math.dist((r, g, b), (cr, cg, cb))
         if dist < min_dist:
             min_dist = dist
             best_aci = aci

@@ -212,28 +212,39 @@ Trích xuất tức thì hướng dẫn chi tiết từ kho 7 chuyên đề ki�
 ## 🔌 CẤU HÌNH VÀO AI CLIENT
 
 ### Antigravity / Claude Desktop / Cursor / VS Code:
-Thêm vào file cấu hình MCP (`~/.gemini/antigravity-ide/mcp_config.json` hoặc `claude_desktop_config.json`):
+Thêm vào file cấu hình MCP (`~/.gemini/config/mcp_config.json` hoặc `claude_desktop_config.json`):
+
+> **Lưu ý:** Nếu bạn dùng lệnh cài đặt 1-chạm (`install-mac.sh` / `install-win.ps1`), file config sẽ được ghi tự động. Chỉ cần cấu hình thủ công nếu bạn muốn tùy chỉnh.
 
 #### Trên macOS:
 ```json
 {
   "mcpServers": {
     "autocad-ai": {
-      "command": "/Users/haianh/Desktop/Obsidian/autocad-mcp/.venv/bin/python",
+      "command": "/đường/dẫn/tới/autocad-ai-mcp/.venv/bin/python",
       "args": ["-m", "autocad_ai.servers.mac_server"]
     }
   }
 }
 ```
+*(Thay `/đường/dẫn/tới/autocad-ai-mcp/` bằng thư mục thực tế trên máy bạn)*
 
 #### Trên Windows:
 ```json
 {
   "mcpServers": {
     "autocad-ai": {
-      "command": "C:\\\\Users\\\\YOUR_USERNAME\\\\.autocad_ai\\\\venv\\\\Scripts\\\\python.exe",
+      "command": "C:\\đường\\dẫn\\tới\\autocad-ai-mcp\\.venv\\Scripts\\python.exe",
       "args": ["-m", "autocad_ai.servers.win_server"]
     }
   }
 }
+```
+*(Thay `C:\đường\dẫn\tới\autocad-ai-mcp\` bằng thư mục thực tế trên máy bạn)*
+
+---
+
+## ⚠️ CẢNH BÁO BẢO MẬT
+
+Module `autocad_mcp` (DXF engine offline) có chức năng `execute_ezdxf_script` cho phép AI viết và thực thi script Python tùy ý thông qua `exec()`. Đây là **theo thiết kế** (by design) để cho phép vẽ các hình dạng phức tạp, nhưng có rủi ro bảo mật tương đương với các MCP server có tính năng chạy code. Nếu triển khai trong môi trường chia sẻ, hãy cân nhắc giới hạn quyền truy cập thư mục làm việc.
 ```

@@ -32,18 +32,42 @@ PYTHON_BIN="$REPO_DIR/.venv/bin/python"
 
 echo "⚙️  [3/4] Tự động cấu hình MCP vào các AI Client trên macOS..."
 
+# Build MCP config JSON snippet
+MCP_ENTRY="{\"autocad-ai\":{\"command\":\"$PYTHON_BIN\",\"args\":[\"-m\",\"autocad_ai.servers.mac_server\"]}}"
+
 # 1. Antigravity IDE Configuration
 ANTIGRAVITY_CONFIG_DIR="$HOME/.gemini/config"
 if [ -d "$ANTIGRAVITY_CONFIG_DIR" ]; then
     MCP_CONF="$ANTIGRAVITY_CONFIG_DIR/mcp_config.json"
-    echo "   -> Cấu hình vào Antigravity ($MCP_CONF)"
+    if [ -f "$MCP_CONF" ]; then
+        # Merge into existing config using python
+        python3 -c "
+import json, sys
+with open('$MCP_CONF','r') as f: cfg=json.load(f)
+cfg.setdefault('mcpServers',{})['autocad-ai']={'command':'$PYTHON_BIN','args':['-m','autocad_ai.servers.mac_server']}
+with open('$MCP_CONF','w') as f: json.dump(cfg,f,indent=2)
+" 2>/dev/null && echo "   ✅ Đã ghi cấu hình vào Antigravity ($MCP_CONF)" || echo "   ⚠️  Không thể ghi Antigravity config, hãy cấu hình thủ công"
+    else
+        echo "{\"mcpServers\":$MCP_ENTRY}" | python3 -m json.tool > "$MCP_CONF" 2>/dev/null
+        echo "   ✅ Đã tạo cấu hình Antigravity ($MCP_CONF)"
+    fi
 fi
 
 # 2. Claude Desktop Configuration
 CLAUDE_CONFIG_DIR="$HOME/Library/Application Support/Claude"
 if [ -d "$CLAUDE_CONFIG_DIR" ]; then
     CLAUDE_CONF="$CLAUDE_CONFIG_DIR/claude_desktop_config.json"
-    echo "   -> Cấu hình vào Claude Desktop ($CLAUDE_CONF)"
+    if [ -f "$CLAUDE_CONF" ]; then
+        python3 -c "
+import json
+with open('$CLAUDE_CONF','r') as f: cfg=json.load(f)
+cfg.setdefault('mcpServers',{})['autocad-ai']={'command':'$PYTHON_BIN','args':['-m','autocad_ai.servers.mac_server']}
+with open('$CLAUDE_CONF','w') as f: json.dump(cfg,f,indent=2)
+" 2>/dev/null && echo "   ✅ Đã ghi cấu hình vào Claude Desktop ($CLAUDE_CONF)" || echo "   ⚠️  Không thể ghi Claude Desktop config, hãy cấu hình thủ công"
+    else
+        echo "{\"mcpServers\":$MCP_ENTRY}" | python3 -m json.tool > "$CLAUDE_CONF" 2>/dev/null
+        echo "   ✅ Đã tạo cấu hình Claude Desktop ($CLAUDE_CONF)"
+    fi
 fi
 
 echo "✅ [4/4] Cài đặt hoàn tất thành công 100%!"
@@ -51,13 +75,15 @@ echo ""
 echo "=============================================================================="
 echo "🎉 AUTOCAD AI MCP ĐÃ SẴN SÀNG SỬ DỤNG TRÊN MACOS!"
 echo "=============================================================================="
-echo "Trọn bộ 6 lệnh nghiệp vụ KTS đã được kích hoạt:"
-echo " 1. cad_draw_new         : Vẽ mặt bằng kiến trúc mới"
-echo " 2. cad_modify           : Sửa đổi, dịch tường, đảo cửa"
-echo " 3. cad_finalize_drawing : Hoàn thiện 4 bản vẽ thi công (Tường, Sàn, Nội thất, Cửa) + Khung A3"
-echo " 4. cad_estimate         : Lập bảng dự toán chi tiết ra file Excel/CSV"
-echo " 5. cad_inspect          : Kiểm tra diện tích thông thủy & lỗi"
-echo " 6. cad_command          : Gửi lệnh AutoCAD gốc"
+echo "Trọn bộ 8 lệnh nghiệp vụ KTS tiếng Việt đã được kích hoạt:"
+echo " 1. cad_ve_moi             : Vẽ mặt bằng kiến trúc mới"
+echo " 2. cad_chinh_sua          : Sửa đổi, dịch tường, đảo cửa"
+echo " 3. cad_hoan_thien_ho_so   : Hoàn thiện bộ bản vẽ thi công TKTC"
+echo " 4. cad_du_toan            : Lập bảng dự toán chi tiết ra Excel/CSV"
+echo " 5. cad_kiem_tra           : Kiểm tra quy chuẩn & dọn rác bản vẽ"
+echo " 6. cad_gui_lenh           : Gửi lệnh AutoCAD gốc"
+echo " 7. cad_in_pdf             : In ấn hồ sơ PDF A3 chuẩn nét"
+echo " 8. cad_tra_cuu_quy_chuan  : Tra cứu quy chuẩn kiến trúc tức thì"
 echo ""
 echo "Để chạy thủ công server: $PYTHON_BIN -m autocad_ai.servers.mac_server"
 echo "=============================================================================="
