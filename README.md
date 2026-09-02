@@ -16,13 +16,13 @@ Toàn bộ các lệnh được chuẩn hóa sang **tiếng Việt không dấu 
 ### 🍎 Dành cho máy macOS (Ở nhà):
 Chạy lệnh sau trong Terminal (chỉ cài module macOS, không dính mã Windows):
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-mac.sh | bash
+curl -sSL https://raw.githubusercontent.com/haianhdskt-boop/autocad-ai-mcp/main/install-mac.sh | bash
 ```
 
 ### 🪟 Dành cho máy Windows (Tại văn phòng):
 Chạy lệnh sau trong PowerShell (chỉ cài module COM ActiveX Windows):
 ```powershell
-irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win.ps1 | iex
+irm https://raw.githubusercontent.com/haianhdskt-boop/autocad-ai-mcp/main/install-win.ps1 | iex
 ```
 
 ---
@@ -31,11 +31,29 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 Áp dụng bắt buộc khi **VẼ (`cad_ve_moi`)**, **HOÀN THIỆN (`cad_hoan_thien_ho_so`)**, **CHỈNH SỬA (`cad_chinh_sua`)** và **KIỂM TRA (`cad_kiem_tra`)**:
 
-1. **CẤM ĐỒ NỘI THẤT ĐÈ VÀO TƯỜNG**: Đồ nội thất phải nằm trọn trong lọt lòng phòng, giữ khoảng hở $\ge 50 - 100\text{mm}$ (trừ hộc tủ âm tường).
-2. **CẤM TƯỜNG ĐÈ LÊN ĐỒ ĐẠC / THIẾT BỊ**: Tường xây phân định rõ ràng với thiết bị vệ sinh, bếp, bàn ghế.
-3. **CẤM CHỮ & GHI CHÚ ĐÈ NHAU**: Tên phòng, diện tích, cao độ không đè lên nhau, không đè lên hatch hay nét vẽ đồ đạc.
-4. **CẤM ĐƯỜNG KÍCH THƯỚC (DIM) ĐÈ NHAU**: Phân cấp 3 tầng DIM chuẩn cách nhau $\ge 800\text{mm}$, không để đường gióng cắt qua số DIM.
-5. **BẢN VẼ PHẢI SẠCH SẼ & MẠCH LẠC**: Dễ đọc, dễ thi công, đúng tiêu chuẩn hồ sơ kỹ thuật.
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│             5 NGUYÊN TẮC BẢN VẼ SẠCH SẼ, MẠCH LẠC & KHÔNG CHỒNG ĐÈ          │
+├───────────────────────────────────┬─────────────────────────────────────────┤
+│ 1. ĐỒ NỘI THẤT - TƯỜNG XÂY        │ CẤM đồ nội thất đè/lấn vào tường xây    │
+│                                   │ 110/220 (trừ hộc tủ âm tường). Giữ khe  │
+│                                   │ hở an toàn >= 50 - 100mm từ mặt trong.  │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 2. TƯỜNG XÂY - ĐỒ NỘI THẤT        │ CẤM nét tường chém/đè lên thiết bị vệ   │
+│                                   │ sinh, bếp, sofa, giường tủ.             │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 3. CHỮ VIẾT, GHI CHÚ & CAO ĐỘ     │ CẤM chữ ghi chú đè lên nhau. CẤM chữ đè │
+│                                   │ lên nét vẽ kiến trúc, thiết bị, hatch.  │
+│                                   │ Text phải đặt ở vùng đệm thoáng đãng.   │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 4. ĐƯỜNG KÍCH THƯỚC (DIM)         │ CẤM các đường DIM đè lên nhau. Phân cấp │
+│                                   │ 3 tầng DIM chuẩn cách nhau >= 800mm.    │
+│                                   │ Không để đường gióng cắt qua số DIM.    │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 5. ĐỘ THOÁNG & THẨM MỸ BẢN VẼ     │ Bản vẽ phải mạch lạc, phân lớp layer rõ │
+│                                   │ ràng, dễ đọc cho kỹ sư & công nhân.     │
+└───────────────────────────────────┴─────────────────────────────────────────┘
+```
 
 ---
 
@@ -74,7 +92,7 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 ---
 
-### 🔧 2. QUY TRỈNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
+### 🔧 2. QUY TRÌNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
 1. **Bước 1: Tiếp Nhận Phản Hồi**: KTS kiểm tra bản vẽ trên AutoCAD và đưa ra yêu cầu (ví dụ: *"Kéo phòng khách rộng thêm 500mm"*).
 2. **Bước 2: Thực Hiện Chỉnh Sửa**: AI gọi `cad_chinh_sua` để `STRETCH`, `MOVE`, `MIRROR` trực tiếp trên AutoCAD.
 3. **Bước 3: Tự Kiểm Tra Lại**: AI gọi `cad_kiem_tra` đảm bảo việc nới rộng phòng này không làm phòng bên cạnh bị bóp hẹp dưới chuẩn và không gây đè nét lên thiết bị.
@@ -165,6 +183,32 @@ Trích xuất tức thì hướng dẫn chi tiết từ kho 7 chuyên đề ki�
 
 ---
 
+## 📊 TRẠNG THÁI HIỆN TẠI & ĐỊNH HƯỚNG PHÁT TRIỂN TIẾP THEO
+
+### ✅ NHỮNG NỘI DUNG ĐÃ HOÀN THÀNH:
+1. **Kiến trúc MCP Server Đa Nền Tảng**: Hỗ trợ 100% AutoCAD 2021-2026 trên macOS (AutoLISP/AppleScript) và Windows (COM ActiveX).
+2. **Trọn bộ 8 Lệnh Nghiệp Vụ Tiếng Việt**: `cad_ve_moi`, `cad_chinh_sua`, `cad_hoan_thien_ho_so`, `cad_du_toan`, `cad_kiem_tra`, `cad_gui_lenh`, `cad_in_pdf`, `cad_tra_cuu_quy_chuan`.
+3. **Đóng gói Thư viện Quy chuẩn Kiến trúc**: Tích hợp toàn bộ kho tri thức `architecture-reference-library` trực tiếp vào `autocad_ai/knowledge/`.
+4. **Bộ 2 Quy Trình SOP Tiêu Chuẩn**: Thiết kế mới 5 bước (có bước KTS duyệt chốt trước khi vẽ) và Chỉnh sửa 4 bước.
+5. **Ràng buộc Chống Chồng Đè (Zero-Overlap)**: Đồ nội thất không đè tường, chữ/ghi chú/DIM không đè lên nhau.
+6. **Động hóa Hồ sơ & Cầu thang**: Cổ bậc thang $h=H/N$, mặt bậc $b=250/270\text{mm}$, phân trang động cửa tối đa 3-4 bộ/A3.
+7. **Xuất PDF & Dự toán Chi tiết**: In PDF A3 đen trắng chuẩn nét kỹ thuật, bóc dự toán xuất file Excel/CSV.
+8. **Kiểm thử tự động**: 16/16 bài unit test (`pytest`) Passed 100%.
+
+---
+
+### ⏳ NỘI DUNG CHƯA LÀM & ĐỊNH HƯỚNG BỔ SUNG TIẾP THEO:
+1. **Chuẩn Hóa Bộ Template CAD (`.dwt`) & Thư Viện Block Riêng**:
+   - Khi bạn cung cấp các file mẫu `.dwg` / `.dwt` của văn phòng, hệ thống sẽ tích hợp để chèn các Block thực tế (Cửa nhôm kính Xingfa, Cửa gỗ Lim, Bệt Inax/Toto, Sofa góc chữ L, Khung tên riêng của công ty) thay vì vẽ nét vector hình học.
+2. **Lệnh Chèn Block Chuyên Nghiệp (`cad_chen_block`)**:
+   - Tự động gọi `_.INSERT` và gán thuộc tính Attribute cho Block cửa, thiết bị nội thất.
+3. **Bảng Thống Kê Động Liên Kết 2 Chiều (Data Extraction)**:
+   - Trích xuất bảng thống kê cửa trực tiếp từ Block Attribute trong AutoCAD và xuất ra Excel.
+4. **Giao Diện Trực Quan Hóa (3D / Isometric Web Viewer)**:
+   - Module xem nhanh hình khối 3D phối cảnh công trình trực tiếp trên trình duyệt trước khi xuất bản vẽ thi công.
+
+---
+
 ## 🔌 CẤU HÌNH VÀO AI CLIENT
 
 ### Antigravity / Claude Desktop / Cursor / VS Code:
@@ -175,7 +219,7 @@ Thêm vào file cấu hình MCP (`~/.gemini/antigravity-ide/mcp_config.json` ho�
 {
   "mcpServers": {
     "autocad-ai": {
-      "command": "/Users/YOUR_USERNAME/.autocad_ai/venv/bin/python",
+      "command": "/Users/haianh/Desktop/Obsidian/autocad-mcp/.venv/bin/python",
       "args": ["-m", "autocad_ai.servers.mac_server"]
     }
   }
