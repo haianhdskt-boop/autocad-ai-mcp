@@ -1,6 +1,36 @@
 # Quy Trình Làm Việc Tiêu Chuẩn (SOP) & Bộ Quy Chuẩn Thiết Kế
 
-Tài liệu này quy định **Cấu trúc kiểm soát quy chuẩn kiến trúc trước khi vẽ** và **2 Quy trình làm việc chuẩn mực (SOP)** giữa Kiến Trúc Sư và Trợ lý AI dựa trên thư viện chuẩn [architecture-reference-library](https://github.com/haianhdskt-boop/architecture-reference-library) được đóng gói trực tiếp trong mã nguồn (`autocad_ai/knowledge/`).
+Tài liệu này quy định **Cấu trúc kiểm soát quy chuẩn kiến trúc trước khi vẽ**, **Ràng buộc bản vẽ sạch sẽ - không chồng đè** và **2 Quy trình làm việc chuẩn mực (SOP)** giữa Kiến Trúc Sư và Trợ lý AI dựa trên thư viện chuẩn [architecture-reference-library](https://github.com/haianhdskt-boop/architecture-reference-library) được đóng gói trực tiếp trong mã nguồn (`autocad_ai/knowledge/`).
+
+---
+
+## 🚫 NGUYÊN TẮC RÀNG BUỘC BẮT BUỘC: BẢN VẼ SẠCH SẼ - KHÔNG CHỒNG ĐÈ (ZERO-OVERLAP)
+
+AI **BẮT BUỘC** phải tuân thủ 5 nguyên tắc vệ sinh bản vẽ sau đây trong cả quá trình **VẼ MỚI (`cad_ve_moi`)**, **HOÀN THIỆN HỒ SƠ (`cad_hoan_thien_ho_so`)**, **CHỈNH SỬA (`cad_chinh_sua`)** và **KIỂM TRA (`cad_kiem_tra`)**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│             5 NGUYÊN TẮC BẢN VẼ SẠCH SẼ, MẠCH LẠC & KHÔNG CHỒNG ĐÈ          │
+├───────────────────────────────────┬─────────────────────────────────────────┤
+│ 1. ĐỒ NỘI THẤT - TƯỜNG XÂY        │ CẤM đồ nội thất đè/lấn vào tường xây    │
+│                                   │ 110/220 (trừ hộc tủ âm tường). Giữ khe  │
+│                                   │ hở an toàn >= 50 - 100mm từ mặt trong.  │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 2. TƯỜNG XÂY - ĐỒ NỘI THẤT        │ CẤM nét tường chém/đè lên thiết bị vệ   │
+│                                   │ sinh, bếp, sofa, giường tủ.             │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 3. CHỮ VIẾT, GHI CHÚ & CAO ĐỘ     │ CẤM chữ ghi chú đè lên nhau. CẤM chữ đè │
+│                                   │ lên nét vẽ kiến trúc, thiết bị, hatch.  │
+│                                   │ Text phải đặt ở vùng đệm thoáng đãng.   │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 4. ĐƯỜNG KÍCH THƯỚC (DIM)         │ CẤM các đường DIM đè lên nhau. Phân cấp │
+│                                   │ 3 tầng DIM chuẩn cách nhau >= 800mm.    │
+│                                   │ Không để đường gióng cắt qua số DIM.    │
+├───────────────────────────────────┼─────────────────────────────────────────┤
+│ 5. ĐỘ THOÁNG & THẨM MỸ BẢN VẼ     │ Bản vẽ phải mạch lạc, phân lớp layer rõ │
+│                                   │ ràng, dễ đọc cho kỹ sư & công nhân.     │
+└───────────────────────────────────┴─────────────────────────────────────────┘
+```
 
 ---
 
@@ -41,8 +71,8 @@ flowchart TD
     A["Bước 1: Nạp Nhiệm Vụ Thiết Kế\n(Khu đất, nhu cầu phòng, phong cách, ảnh mẫu)"] --> B["Bước 2: Phân Tích Quy Chuẩn & Đề Xuất Bố Trí\n(Tra cứu cad_tra_cuu_quy_chuan; Mô tả giao thông, giếng trời)"]
     B --> C{"KTS Chốt\nPhương Án?"}
     C -- "Chưa / Cần chỉnh" --> B
-    C -- "ĐÃ CHỐT" --> D["Bước 3: Triển Khai Vẽ Trực Tiếp Lên AutoCAD\n(Gọi cad_ve_moi theo đúng phân lớp layer)"]
-    D --> E["Bước 4: Tự Kiểm Tra (QA/QC) & Tự Nắn Chỉnh\n(Gọi cad_kiem_tra đối chiếu toàn diện quy chuẩn)"]
+    C -- "ĐÃ CHỐT" --> D["Bước 3: Triển Khai Vẽ Trực Tiếp Lên AutoCAD\n(Gọi cad_ve_moi - Đảm bảo Zero-Overlap không chồng đè)"]
+    D --> E["Bước 4: Tự Kiểm Tra (QA/QC) & Tự Nắn Chỉnh\n(Gọi cad_kiem_tra quét sạch lỗi chồng đè & quy chuẩn)"]
     E --> F["Bước 5: Báo Cáo Hoàn Thành Cho KTS\n(Bảng diện tích m2, danh sách chuẩn đã đạt)"]
 ```
 
@@ -70,6 +100,7 @@ flowchart TD
 #### 🔹 Bước 3: Triển Khai Vẽ Trực Tiếp Lên AutoCAD
 * **AI thực hiện**:
   - Gọi công cụ **`cad_ve_moi`** để vẽ trực tiếp từng đối tượng lên AutoCAD theo đúng phương án đã chốt.
+  - **Tuân thủ quy tắc Không Chồng Đè**: Đồ nội thất nằm gọn trong lọt lòng phòng, chữ ghi chú đặt ở vùng đệm riêng không đè lên đồ đạc hay nét hatch.
   - Phân loại đúng các lớp layer chuẩn:
     - `KT_TUONG_220`: Tường bao ngoài, cột chịu lực (Màu 1 - Đỏ).
     - `KT_TUONG_110`: Tường ngăn phòng (Màu 2 - Vàng).
@@ -82,16 +113,16 @@ flowchart TD
 #### 🔹 Bước 4: Tự Kiểm Tra (QA/QC) & Tự Hiệu Chỉnh
 * **AI thực hiện**:
   - Tự động gọi **`cad_kiem_tra` (action: 'audit_full_plan')** kiểm tra:
-    - Rà soát toàn bộ kích thước lọt lòng và diện tích phòng xem có phòng nào bị hẹp dưới ngưỡng tiêu chuẩn không.
-    - Kiểm tra nút thắt giao thông hành lang, khoảng mở cánh cửa không bị va đập vào thiết bị vệ sinh hay giường tủ.
-    - Đối chiếu tọa độ các phòng trên AutoCAD với phương án đã chốt ở Bước 2.
-  - Nếu phát hiện nét hở hoặc phòng chưa khớp, AI **tự động nắn chỉnh sửa lại ngay** trước khi bàn giao.
+    - **Quét chồng đè**: Xác nhận không có đồ nội thất đè vào tường, không có chữ số DIM hay ghi chú đè lên nhau.
+    - **Quét thông thủy**: Rà soát kích thước lọt lòng và diện tích phòng.
+    - **Quét giao thông**: Kiểm tra không có nút thắt hành lang $< 900\text{mm}$.
+  - Nếu phát hiện nét hở, chữ đè hoặc phòng chưa khớp, AI **tự động nắn chỉnh sửa lại ngay** trước khi bàn giao.
 
 #### 🔹 Bước 5: Báo Cáo Hoàn Thành Cho KTS
 * **AI thực hiện**:
   - Báo cáo rõ ràng:
     - Bảng tổng hợp diện tích xây dựng và diện tích thông thủy chi tiết từng phòng.
-    - Danh sách các tiêu chuẩn công thái học và an toàn đã được đáp ứng.
+    - Danh sách các tiêu chuẩn công thái học, độ sạch sẽ bản vẽ đã được đáp ứng.
     - Mời KTS kiểm tra thực tế trên màn hình AutoCAD.
 
 ---
@@ -101,7 +132,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     M1["Bước 1: KTS Kiểm Tra & Ra Lệnh Chỉnh Sửa\n(Dịch tường, đổi kích thước, đảo cửa)"] --> M2["Bước 2: AI Thực Hiện Sửa Trực Tiếp Trên AutoCAD\n(Gọi cad_chinh_sua - Stretch, Move, Mirror)"]
-    M2 --> M3["Bước 3: Tự Kiểm Tra Quy Chuẩn Sau Sửa\n(Gọi cad_kiem_tra đảm bảo phòng bị co lại vẫn đạt chuẩn)"]
+    M2 --> M3["Bước 3: Tự Kiểm Tra Quy Chuẩn & Chồng Đè Sau Sửa\n(Gọi cad_kiem_tra đảm bảo không phát sinh lỗi đè nét)"]
     M3 --> M4["Bước 4: Báo Cáo Hoàn Thành Cho KTS\n(Zoom đến vị trí vừa sửa, báo kích thước mới)"]
 ```
 
@@ -120,7 +151,8 @@ flowchart TD
 
 #### 🔹 Bước 3: Tự Kiểm Tra Lại Kết Quả Sau Sửa (Rà Soát Xung Đột)
 * AI tự động gọi **`cad_kiem_tra`**:
-  - Việc nới rộng phòng này có làm **phòng bên cạnh bị bóp hẹp dưới diện tích tối thiểu** hay không (ví dụ dời tường phòng khách làm phòng bếp bị hẹp < 12m² hoặc hành lang bị hẹp < 900mm).
+  - Việc nới rộng phòng này có làm **phòng bên cạnh bị bóp hẹp dưới diện tích tối thiểu** hay không.
+  - Đảm bảo việc dịch chuyển tường **không đè lên đồ nội thất/thiết bị vệ sinh** đã đặt trước đó.
   - Tự động nắn chỉnh lại các đối tượng nội thất và đường Dim liên quan.
 
 #### 🔹 Bước 4: Báo Cáo Hoàn Thành Cho KTS

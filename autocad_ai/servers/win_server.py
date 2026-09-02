@@ -23,18 +23,25 @@ DANH SÁCH 8 LỆNH NGHIỆP VỤ TIẾNG VIỆT (KHÔNG DẤU):
 7. cad_in_pdf: In ấn & xuất hồ sơ PDF A3 đen trắng chuẩn nét kỹ thuật.
 8. cad_tra_cuu_quy_chuan: Tra cứu tức thì công thái học & quy chuẩn kiến trúc từ thư viện mã nguồn.
 
+RÀNG BUỘC BẮT BUỘC: BẢN VẼ SẠCH SẼ - KHÔNG CHỒNG ĐÈ (ÁP DỤNG KHI VẼ & KHI KIỂM TRA):
+- CẤM đồ nội thất đè vào tường hoặc lấn qua mảng tường 110/220 (trừ hộc tủ âm tường).
+- CẤM tường đè lên đồ nội thất, thiết bị vệ sinh hoặc bếp.
+- CẤM chữ / ghi chú / cao độ đè lên nhau, đè lên nét vẽ hoặc đè lên hatch.
+- CẤM đường kích thước DIM đè lên nhau (phân cấp 3 tầng DIM rõ ràng cách nhau >= 800mm).
+- Bản vẽ phải luôn sạch sẽ, mạch lạc, dễ nhìn và thoáng đãng.
+
 TUÂN THỦ 2 QUY TRÌNH CHUẨN CỦA KIẾN TRÚC SƯ:
 🏛️ QUY TRÌNH 1: THIẾT KẾ MỚI (5 BƯỚC)
 1. Bước 1: Tiếp nhận diện tích, công năng, sở thích, ảnh mẫu.
 2. Bước 2: Đối chiếu quy chuẩn & Đề xuất phương án. DỪNG LẠI CHỜ KTS CHỐT PHƯƠNG ÁN trước khi vẽ.
-3. Bước 3: Gọi 'cad_ve_moi' vẽ trực tiếp lên AutoCAD theo phương án đã chốt.
-4. Bước 4: Gọi 'cad_kiem_tra' (action='audit_full_plan') tự kiểm tra toàn diện thông thủy & tự sửa nếu có lệch.
+3. Bước 3: Gọi 'cad_ve_moi' vẽ trực tiếp lên AutoCAD theo phương án đã chốt (đảm bảo không chồng đè).
+4. Bước 4: Gọi 'cad_kiem_tra' (action='audit_full_plan') tự kiểm tra toàn diện thông thủy & tự sửa nếu có lệch/đè nét.
 5. Bước 5: Báo cáo hoàn thành bảng diện tích m2 và thông số cho KTS.
 
 🔧 QUY TRÌNH 2: CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
 1. Bước 1: Tiếp nhận yêu cầu chỉnh sửa từ KTS.
 2. Bước 2: Gọi 'cad_chinh_sua' để Stretch, Move, Mirror, Rotate trực tiếp trên AutoCAD.
-3. Bước 3: Rà soát không gian ảnh hưởng, đảm bảo không làm phòng lân cận bị hẹp dưới ngưỡng tiêu chuẩn.
+3. Bước 3: Rà soát không gian ảnh hưởng, đảm bảo không làm phòng lân cận bị hẹp dưới chuẩn và không gây chồng đè.
 4. Bước 4: Zoom đến vị trí sửa và thông báo kích thước mới cho KTS.
 """
 

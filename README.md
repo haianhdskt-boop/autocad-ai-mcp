@@ -7,7 +7,7 @@
 
 Hệ sinh thái **Model Context Protocol (MCP)** chuyên biệt hóa dành cho **Kiến Trúc Sư & Kỹ Sư Xây Dựng**. Tích hợp sẵn toàn bộ kho dữ liệu quy chuẩn kiến trúc [architecture-reference-library](https://github.com/haianhdskt-boop/architecture-reference-library) vào mã nguồn (`autocad_ai/knowledge/`), điều khiển và tương tác theo thời gian thực trên màn hình **AutoCAD (2021 - 2026)** trên cả **macOS** và **Windows**.
 
-Toàn bộ các lệnh đã được chuẩn hóa sang **tiếng Việt không dấu (tiền tố `cad_`)** giúp Kiến Trúc Sư dễ nhớ, dễ gõ và dễ ra lệnh!
+Toàn bộ các lệnh được chuẩn hóa sang **tiếng Việt không dấu (tiền tố `cad_`)** và ràng buộc nghiêm ngặt nguyên tắc **"Bản vẽ sạch sẽ - Không chồng đè"**.
 
 ---
 
@@ -27,9 +27,19 @@ irm https://raw.githubusercontent.com/YOUR_USERNAME/autocad-mcp/main/install-win
 
 ---
 
-## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP) & BỘ QUY CHUẨN TRƯỚC KHI VẼ
+## 🚫 NGUYÊN TẮC RÀNG BUỘC: BẢN VẼ SẠCH SẼ - KHÔNG CHỒNG ĐÈ (ZERO-OVERLAP)
 
-Hệ thống vận hành theo 2 quy trình chuẩn mực, kiểm soát nghiêm ngặt các ngưỡng thông thủy công thái học:
+Áp dụng bắt buộc khi **VẼ (`cad_ve_moi`)**, **HOÀN THIỆN (`cad_hoan_thien_ho_so`)**, **CHỈNH SỬA (`cad_chinh_sua`)** và **KIỂM TRA (`cad_kiem_tra`)**:
+
+1. **CẤM ĐỒ NỘI THẤT ĐÈ VÀO TƯỜNG**: Đồ nội thất phải nằm trọn trong lọt lòng phòng, giữ khoảng hở $\ge 50 - 100\text{mm}$ (trừ hộc tủ âm tường).
+2. **CẤM TƯỜNG ĐÈ LÊN ĐỒ ĐẠC / THIẾT BỊ**: Tường xây phân định rõ ràng với thiết bị vệ sinh, bếp, bàn ghế.
+3. **CẤM CHỮ & GHI CHÚ ĐÈ NHAU**: Tên phòng, diện tích, cao độ không đè lên nhau, không đè lên hatch hay nét vẽ đồ đạc.
+4. **CẤM ĐƯỜNG KÍCH THƯỚC (DIM) ĐÈ NHAU**: Phân cấp 3 tầng DIM chuẩn cách nhau $\ge 800\text{mm}$, không để đường gióng cắt qua số DIM.
+5. **BẢN VẼ PHẢI SẠCH SẼ & MẠCH LẠC**: Dễ đọc, dễ thi công, đúng tiêu chuẩn hồ sơ kỹ thuật.
+
+---
+
+## 📋 QUY TRÌNH LÀM VIỆC TIÊU CHUẨN (SOP) & BỘ QUY CHUẨN TRƯỚC KHI VẼ
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -58,16 +68,16 @@ Hệ thống vận hành theo 2 quy trình chuẩn mực, kiểm soát nghiêm n
 ### 🏛️ 1. QUY TRÌNH THIẾT KẾ MỚI (5 BƯỚC)
 1. **Bước 1: Nạp Nhiệm Vụ Thiết Kế**: KTS cung cấp kích thước đất, số tầng, danh sách phòng, sở thích/phong cách, ảnh tham khảo.
 2. **Bước 2: Phân Tích Quy Chuẩn & Đề Xuất Bố Trí**: AI gọi `cad_tra_cuu_quy_chuan`, đối chiếu quy chuẩn, lập mô tả chi tiết phương án phân chia không gian, giao thông, giếng trời, cầu thang. **AI DỪNG LẠI CHỜ KTS CHỐT** trước khi vẽ.
-3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_ve_moi` vẽ trực tiếp lên AutoCAD theo đúng layer chuẩn.
-4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động chạy `cad_kiem_tra` (action: `audit_full_plan`) kiểm tra kích thước thông thủy, an toàn lan can, tự động nắn chỉnh nếu phát hiện sai lệch.
+3. **Bước 3: Triển Khai Vẽ Trực Tiếp**: Sau khi KTS đồng ý chốt, AI gọi `cad_ve_moi` vẽ trực tiếp lên AutoCAD (tuân thủ nghiêm ngặt nguyên tắc Không Chồng Đè).
+4. **Bước 4: Tự Kiểm Tra & Sửa Lỗi**: AI tự động chạy `cad_kiem_tra` (action: `audit_full_plan`) kiểm tra kích thước thông thủy, quét sạch các lỗi chồng đè đồ đạc, chữ viết hay đường DIM.
 5. **Bước 5: Báo Cáo Hoàn Thành**: Thông báo diện tích m2 chi tiết từng phòng cho KTS nghiệm thu.
 
 ---
 
-### 🔧 2. QUY TRÌNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
+### 🔧 2. QUY TRỈNH CHỈNH SỬA / HIỆU CHỈNH (4 BƯỚC)
 1. **Bước 1: Tiếp Nhận Phản Hồi**: KTS kiểm tra bản vẽ trên AutoCAD và đưa ra yêu cầu (ví dụ: *"Kéo phòng khách rộng thêm 500mm"*).
 2. **Bước 2: Thực Hiện Chỉnh Sửa**: AI gọi `cad_chinh_sua` để `STRETCH`, `MOVE`, `MIRROR` trực tiếp trên AutoCAD.
-3. **Bước 3: Tự Kiểm Tra Lại**: AI gọi `cad_kiem_tra` đảm bảo việc nới rộng phòng này không làm phòng bên cạnh bị bóp hẹp dưới ngưỡng diện tích tối thiểu.
+3. **Bước 3: Tự Kiểm Tra Lại**: AI gọi `cad_kiem_tra` đảm bảo việc nới rộng phòng này không làm phòng bên cạnh bị bóp hẹp dưới chuẩn và không gây đè nét lên thiết bị.
 4. **Bước 4: Báo Cáo Hoàn Thành**: Zoom bản vẽ vào vị trí vừa sửa và thông báo kích thước mới cho KTS.
 
 ---
@@ -100,7 +110,7 @@ Hệ thống vận hành theo 2 quy trình chuẩn mực, kiểm soát nghiêm n
 ---
 
 ### 1️⃣ `cad_ve_moi` — Vẽ Mặt Bằng Kiến Trúc Mới
-Vẽ trực tiếp mặt bằng lên không gian Model của AutoCAD theo đúng phân lớp layer chuẩn (`KT_TUONG_220`, `KT_TUONG_110`, `KT_CUA_DI`, `KT_THANG`, `KT_NOITHAT`).
+Vẽ trực tiếp mặt bằng lên không gian Model của AutoCAD theo đúng phân lớp layer chuẩn (`KT_TUONG_220`, `KT_TUONG_110`, `KT_CUA_DI`, `KT_THANG`, `KT_NOITHAT`), định vị nội thất và text không chồng đè.
 * **Ví dụ ra lệnh**:
   > *"Vẽ mặt bằng nhà phố 5x15m gồm sân trước 2.5m, phòng khách 4.5m, thang 2.5m, bếp 4m, WC và sân sau 1.5m, có bố trí nội thất cơ bản."*
 
@@ -132,10 +142,10 @@ Tính toán khối lượng toàn diện theo định mức xây dựng Việt N
 * **Ví dụ ra lệnh**:
   > *"Lập bảng dự toán chi tiết công trình 2 tầng 5x15m cao 3.6m xuất ra file Excel du_toan.csv"*
 
-### 5️⃣ `cad_kiem_tra` — Rà Soát Toàn Bộ Mặt Bằng & Dọn Rác Bản Vẽ
-Rà soát toàn diện mặt bằng (`audit_full_plan`) đối chiếu với toàn bộ tiêu chuẩn công thái học kiến trúc và chạy lệnh Audit / Purge dọn sạch file rác.
+### 5️⃣ `cad_kiem_tra` — Rà Soát Toàn Bộ Mặt Bằng, Chống Chồng Đè & Dọn Rác
+Rà soát toàn diện mặt bằng (`audit_full_plan`) đối chiếu với toàn bộ tiêu chuẩn công thái học kiến trúc, quét sạch lỗi chồng đè đồ đạc/tường/DIM và chạy lệnh Audit / Purge dọn sạch file rác.
 * **Ví dụ ra lệnh**:
-  > *"Kiểm tra toàn bộ mặt bằng xem có phòng nào bị hẹp dưới chuẩn không và dọn rác bản vẽ."*
+  > *"Kiểm tra toàn bộ mặt bằng xem có phòng nào bị hẹp dưới chuẩn hoặc bị đè nét không và dọn rác bản vẽ."*
 
 ### 6️⃣ `cad_gui_lenh` — Gửi Lệnh AutoCAD Gốc
 Gửi trực tiếp các lệnh AutoCAD như `_.ZOOM _E`, `-PURGE ALL * N`, `_.REGENALL`.

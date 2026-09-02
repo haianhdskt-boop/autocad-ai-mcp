@@ -60,18 +60,20 @@ def build_new_floor_plan_commands(
             cmds.append("_.-LAYER _S KT_TUONG_110  ")
             cmds.append(f"_.LINE {ox + wall_ext_mm},{y1} {ox + w - wall_ext_mm},{y1} ")
 
-        # Room label & area
+        # Room label & area (Placed in clear zone above/offset from furniture)
         area_m2 = round(((x2 - x1) * (y2 - y1)) / 1_000_000.0, 1)
         cx = (x1 + x2) / 2.0
         cy = (y1 + y2) / 2.0
-        cmds.append("_.-LAYER _S KT_TEXT  ")
-        cmds.append(f"_.-TEXT {cx - 600},{cy} 220 0 {r_name}")
-        cmds.append(f"_.-TEXT {cx - 400},{cy - 300} 160 0 (S = {area_m2}m2)")
 
-        # Specific elements based on room type
+        # Dedicated clear zone for text to avoid overlapping furniture
+        text_y = y1 + 600.0 if rtype in ("dining", "kitchen", "bep") else cy
+        cmds.append("_.-LAYER _S KT_TEXT  ")
+        cmds.append(f"_.-TEXT {cx - 600},{text_y + 120} 220 0 {r_name}")
+        cmds.append(f"_.-TEXT {cx - 400},{text_y - 180} 160 0 (S = {area_m2}m2)")
+
+        # Specific elements based on room type (Strictly bounded inside inner clear area)
         if rtype in ("stairs", "staircase", "thang"):
             cmds.append("_.-LAYER _S KT_THANG  ")
-            # Draw stairs steps
             stair_w = (x2 - x1)
             step_count = int(r.get("step_count", 10))
             step_depth = (y2 - y1) / max(step_count, 1)
@@ -81,32 +83,33 @@ def build_new_floor_plan_commands(
             # Mid line
             mid_x = (x1 + x2) / 2.0
             cmds.append(f"_.LINE {mid_x},{y1} {mid_x},{y2} ")
-            # Up arrow
+            # Up arrow (offset from text)
             cmds.append(f"_.LINE {x1 + stair_w*0.25},{y1 + 200} {x1 + stair_w*0.25},{y2 - 200} ")
-            cmds.append(f"_.-TEXT {x1 + stair_w*0.25 + 50},{cy} 140 0 UP")
+            cmds.append(f"_.-TEXT {x1 + stair_w*0.25 + 50},{cy - 200} 140 0 UP")
 
         elif rtype in ("living", "khach") and include_furniture:
             cmds.append("_.-LAYER _S KT_NOITHAT  ")
-            # Sofa
-            cmds.append(f"_.RECTANG {x1 + 200},{y1 + 400} {x1 + 1000},{y2 - 400}")
-            # Coffee table
-            cmds.append(f"_.RECTANG {x1 + 1300},{cy - 400} {x1 + 2100},{cy + 400}")
-            # TV shelf
-            cmds.append(f"_.RECTANG {x2 - 500},{y1 + 400} {x2 - 200},{y2 - 400}")
+            # Sofa (strictly offset from walls >= 100mm)
+            cmds.append(f"_.RECTANG {x1 + 100},{y1 + 400} {x1 + 950},{y2 - 400}")
+            # Coffee table (centered, non-overlapping with sofa)
+            cmds.append(f"_.RECTANG {x1 + 1250},{cy - 350} {x1 + 2050},{cy + 350}")
+            # TV shelf (offset from right wall)
+            cmds.append(f"_.RECTANG {x2 - 450},{y1 + 400} {x2 - 100},{y2 - 400}")
 
         elif rtype in ("dining", "kitchen", "bep") and include_furniture:
             cmds.append("_.-LAYER _S KT_NOITHAT  ")
-            # Dining table 6 chairs
-            cmds.append(f"_.RECTANG {cx - 400},{cy - 700} {cx + 400},{cy + 700}")
-            # Kitchen counter
+            # Dining table 6 chairs (placed in upper half, clear of bottom text)
+            table_cy = cy + 400.0
+            cmds.append(f"_.RECTANG {cx - 400},{table_cy - 500} {cx + 400},{table_cy + 500}")
+            # Kitchen counter L or I (offset from walls)
             cmds.append(f"_.LINE {x1 + 100},{y2 - 600} {x2 - 100},{y2 - 600} ")
 
         elif rtype in ("wc", "bath", "ve_sinh") and include_furniture:
             cmds.append("_.-LAYER _S KT_NOITHAT  ")
-            # Toilet bowl
-            cmds.append(f"_.CIRCLE {x1 + 500},{y1 + 500} 200")
-            # Lavabo
-            cmds.append(f"_.RECTANG {x2 - 550},{y2 - 450} {x2 - 150},{y2 - 150}")
+            # Toilet bowl (hở tường 100mm, không cấn góc)
+            cmds.append(f"_.CIRCLE {x1 + 450},{y1 + 450} 180")
+            # Lavabo (hở tường 50mm)
+            cmds.append(f"_.RECTANG {x2 - 500},{y2 - 400} {x2 - 100},{y2 - 100}")
 
     cmds.append("_.ZOOM _E")
     return cmds

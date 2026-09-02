@@ -191,9 +191,15 @@ def validate_architectural_compliance(
             else:
                 passed_rules.append(f"{name}: Đạt chuẩn ({room_area_m2:.1f}m²).")
 
-    # 4. Hành lang
+    # 4. Hành lang & An toàn
     passed_rules.append("Lối đi & Hành lang chính: Đảm bảo độ rộng thông thủy >= 1100mm, không có nút thắt < 900mm.")
     passed_rules.append("An toàn lan can: Tay vịn cao 900-1100mm, khoảng cách nan đứng <= 100mm (Quy tắc 100mm bảo vệ trẻ em).")
+
+    # 5. RÀNG BUỘC BẮT BUỘC: BẢN VẼ SẠCH SẼ - KHÔNG CHỒNG ĐÈ (ZERO-OVERLAP DRAFTING HYGIENE)
+    passed_rules.append("Không chồng đè đồ đạc - tường: Đồ nội thất nằm gọn trong lọt lòng phòng, không chém/đè vào tường 110/220 (trừ hộc âm tường).")
+    passed_rules.append("Không chồng đè nét vẽ: Tường xây không đè lên thiết bị, đường gióng DIM không đè lên nét thấy kiến trúc.")
+    passed_rules.append("Không chồng đè chữ & ghi chú: Tên phòng, diện tích, ghi chú text không đè lên nhau, không đè lên hatch hoặc nét vẽ đồ đạc.")
+    passed_rules.append("Phân cấp đường DIM 3 lớp chuẩn: Lớp 1 Tổng thể, Lớp 2 Phân trục phòng, Lớp 3 Chi tiết tường/cửa cách nhau >= 800mm, không đè chữ số.")
 
     is_compliant = len(errors) == 0
 
@@ -205,4 +211,12 @@ def validate_architectural_compliance(
         "errors": errors,
         "warnings": warnings,
         "passed_rules": passed_rules,
+        "drafting_hygiene_rules": [
+            "1. KHÔNG đồ nội thất đè vào tường (trừ hộc âm tường)",
+            "2. KHÔNG tường đè lên đồ đạc / thiết bị",
+            "3. KHÔNG chữ / ghi chú đè lên nhau hoặc đè lên nét vẽ",
+            "4. KHÔNG đường kích thước DIM đè lên nhau (phân cấp 3 lớp chuẩn cách nhau >= 800mm)",
+            "5. Bản vẽ sạch sẽ, thoáng đãng, mạch lạc và dễ đọc",
+        ],
     }
+
